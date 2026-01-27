@@ -13,11 +13,13 @@ from core.settings_manager import load_settings, DEFAULT_DECK_NAME
 from core import audio_utils
 from api.anki_api import anki_api
 from core.workers import add_to_anki_worker, format_clipboard_text
-from core.ui_callbacks import update_processing_indicator
+# NOTE: update_processing_indicator импортируется внутри функций чтобы избежать циклического импорта
 
 
 def process_clipboard_queue(root):
     """Обрабатывает очередь буфера обмена"""
+    from core.ui_callbacks import update_processing_indicator
+    
     if not root or not root.winfo_exists():
         return
     
@@ -54,6 +56,8 @@ def process_clipboard_queue(root):
 
 def process_results_queue(root):
     """Обрабатывает очередь результатов"""
+    from core.ui_callbacks import update_processing_indicator
+    
     try:
         message, data = app_state.results_queue.get_nowait()
         widgets = app_state.main_window_components["widgets"]

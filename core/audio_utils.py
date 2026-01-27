@@ -3,7 +3,7 @@ import re
 import hashlib
 import time
 import subprocess
-from gtts import gTTS
+# NOTE: gtts импортируется лениво в generate_audio() для ускорения старта
 import tkinter as tk
 from tkinter import messagebox
 import threading
@@ -234,6 +234,7 @@ def generate_audio(text, lang=None, speed_level=None, tld=None, debug=True):
     filepath = os.path.join(audio_folder, filename)
     
     try:
+        from gtts import gTTS  # Lazy import
         tts = gTTS(text=processed_text, lang=lang, slow=gtts_slow, tld=tld)
         tts.save(filepath)
         return filepath if os.path.exists(filepath) else None
