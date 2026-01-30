@@ -18,6 +18,7 @@ from core.settings_manager import save_settings, get_user_dir
 from core.prompts_manager import prompts_manager, update_active_prompts, rename_prompt_preset
 from core.app_state import app_state
 from ui.main_window import ask_string_dialog
+from core.localization import localization_manager
 
 
 def open_settings_window(parent, dependencies=None, settings=None, initial_tab=None):
@@ -36,7 +37,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         settings = load_settings(update_app_state=False)
     
     win = ctk.CTkToplevel(parent)
-    win.title("Настройки")
+    win.title(localization_manager.get_text("settings"))
     win.geometry("700x750")
     win.transient(parent)
     win.grab_set()
@@ -45,16 +46,23 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     tabview = ctk.CTkTabview(win)
     tabview.pack(fill="both", expand=True, padx=10, pady=10)
     
-    tab_tts = tabview.add("Озвучка")
-    tab_prompts = tabview.add("Промпты")
-    tab_ai = tabview.add("AI")
-    tab_font = tabview.add("Шрифт")
-    tab_theme = tabview.add("Тема")
+    tab_tts = tabview.add(localization_manager.get_text("tab_audio"))
+    tab_prompts = tabview.add(localization_manager.get_text("tab_prompts"))
+    tab_ai = tabview.add(localization_manager.get_text("tab_ai"))
+    tab_font = tabview.add(localization_manager.get_text("tab_font"))
+    tab_theme = tabview.add(localization_manager.get_text("tab_theme"))
     
     # Восстанавливаем последнюю вкладку или используем запрошенную
-    target_tab = initial_tab if initial_tab else settings.get("LAST_SETTINGS_TAB", "Озвучка")
+    default_tab = localization_manager.get_text("tab_audio")
+    target_tab = initial_tab if initial_tab else settings.get("LAST_SETTINGS_TAB", default_tab)
     
-    tab_names = ["Озвучка", "Промпты", "AI", "Шрифт", "Тема"]
+    tab_names = [
+        localization_manager.get_text("tab_audio"),
+        localization_manager.get_text("tab_prompts"),
+        localization_manager.get_text("tab_ai"),
+        localization_manager.get_text("tab_font"),
+        localization_manager.get_text("tab_theme")
+    ]
     if target_tab in tab_names:
         tabview.set(target_tab)
 
@@ -66,26 +74,26 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         btn.place(relx=1.0, rely=0.0, anchor="ne", x=-5, y=5)
 
     # Добавляем кнопки помощи
-    add_help_btn(tab_tts, "Озвучка", "Settings_Audio_Help.txt")
-    add_help_btn(tab_ai, "AI", "Settings_AI_Help.txt")
-    add_help_btn(tab_prompts, "Промпты", "Main_Window_Help.txt") # Используем общую справку
+    add_help_btn(tab_tts, localization_manager.get_text("tab_audio"), "Settings_Audio_Help.txt")
+    add_help_btn(tab_ai, localization_manager.get_text("tab_ai"), "Settings_AI_Help.txt")
+    add_help_btn(tab_prompts, localization_manager.get_text("tab_prompts"), "Main_Window_Help.txt") # Используем общую справку
     
     # Настройка контекстного меню теперь через clipboard_manager
     # Функция add_context_menu больше не нужна, используем setup_text_widget_context_menu
     
     # === TTS Settings ===
-    ctk.CTkLabel(tab_tts, text="Скорость озвучки:").pack(anchor="w", padx=10, pady=(10, 0))
+    ctk.CTkLabel(tab_tts, text=localization_manager.get_text("speed_label")).pack(anchor="w", padx=10, pady=(10, 0))
     speed_map = {"1.0x (Норм)": 0, "0.8x (Медл)": 1, "0.5x (Очень медл)": 2}
     speed_map_rev = {v: k for k, v in speed_map.items()}
     speed_var = tk.StringVar(value=speed_map_rev.get(settings.get("TTS_SPEED_LEVEL", 0), "1.0x (Норм)"))
     speed_combo = ctk.CTkComboBox(tab_tts, variable=speed_var, values=list(speed_map.keys()))
     speed_combo.pack(anchor="w", padx=10, pady=(0, 10))
     
-    ctk.CTkLabel(tab_tts, text="Язык (lang):").pack(anchor="w", padx=10)
+    ctk.CTkLabel(tab_tts, text=localization_manager.get_text("lang_label")).pack(anchor="w", padx=10)
     lang_var = tk.StringVar(value=settings.get("TTS_LANG", "de"))
     ctk.CTkComboBox(tab_tts, variable=lang_var, values=["de", "en", "ru", "fr", "es"]).pack(anchor="w", padx=10, pady=(0, 10))
     
-    ctk.CTkLabel(tab_tts, text="Домен (tld):").pack(anchor="w", padx=10)
+    ctk.CTkLabel(tab_tts, text=localization_manager.get_text("tld_label")).pack(anchor="w", padx=10)
     tld_var = tk.StringVar(value=settings.get("TTS_TLD", "de"))
     ctk.CTkComboBox(tab_tts, variable=tld_var, values=["com", "de", "ru", "co.uk", "fr"]).pack(anchor="w", padx=10, pady=(0, 10))
     
@@ -98,16 +106,16 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         except Exception:
             pass
     
-    ctk.CTkButton(tab_tts, text="🔊 Тест озвучки", command=test_tts).pack(padx=10, pady=20)
+    ctk.CTkButton(tab_tts, text="🔊 " + localization_manager.get_text("test_audio"), command=test_tts).pack(padx=10, pady=20)
     
     # === AI Settings (NEW TAB) ===
-    ctk.CTkLabel(tab_ai, text="Настройки AI провайдера", font=("Roboto", 16, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
+    ctk.CTkLabel(tab_ai, text=localization_manager.get_text("ai_provider_settings"), font=("Roboto", 16, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
     
     # Провайдер AI
     provider_row = ctk.CTkFrame(tab_ai, fg_color="transparent")
     provider_row.pack(fill="x", padx=10, pady=(0, 10))
     
-    ctk.CTkLabel(provider_row, text="Провайдер:").pack(side="left", padx=(0, 10))
+    ctk.CTkLabel(provider_row, text=localization_manager.get_text("provider_label")).pack(side="left", padx=(0, 10))
     provider_var = tk.StringVar(value=settings.get("AI_PROVIDER", "ollama"))
     provider_combo = ctk.CTkComboBox(provider_row, variable=provider_var, values=["ollama", "openrouter", "google"], width=150)
     provider_combo.pack(side="left")
@@ -119,20 +127,20 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     # === Ollama настройки ===
     ollama_frame = ctk.CTkFrame(provider_settings_container)
     
-    ctk.CTkLabel(ollama_frame, text="⚡ Ollama (локальный AI)", font=("Roboto", 14, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
+    ctk.CTkLabel(ollama_frame, text="⚡ " + localization_manager.get_text("ollama_local"), font=("Roboto", 14, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
     
-    ctk.CTkLabel(ollama_frame, text="URL сервера:").pack(anchor="w", padx=10)
+    ctk.CTkLabel(ollama_frame, text=localization_manager.get_text("server_url")).pack(anchor="w", padx=10)
     ollama_url_var = tk.StringVar(value=settings.get("OLLAMA_URL", "http://localhost:11434"))
     ollama_url_entry = ctk.CTkEntry(ollama_frame, textvariable=ollama_url_var, width=350)
     ollama_url_entry.pack(anchor="w", padx=10, pady=(0, 15))
     setup_text_widget_context_menu(ollama_url_entry)
     
-    ctk.CTkLabel(ollama_frame, text="Модель:").pack(anchor="w", padx=10)
+    ctk.CTkLabel(ollama_frame, text=f"{localization_manager.get_text('model_label')}:").pack(anchor="w", padx=10)
     model_row = ctk.CTkFrame(ollama_frame, fg_color="transparent")
     model_row.pack(fill="x", padx=10, pady=(0, 10))
     
     ollama_model_var = tk.StringVar(value=settings.get("OLLAMA_MODEL", ""))
-    ollama_model_combo = ctk.CTkComboBox(model_row, variable=ollama_model_var, values=[settings.get("OLLAMA_MODEL", "Загрузка...")], width=280)
+    ollama_model_combo = ctk.CTkComboBox(model_row, variable=ollama_model_var, values=[settings.get("OLLAMA_MODEL", localization_manager.get_text("loading"))], width=280)
     ollama_model_combo.pack(side="left")
     
     
@@ -155,20 +163,14 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
                 if not current or current not in models:
                     ollama_model_var.set(models[0])
                 
-                # Визуальное подтверждение успеха без попапа
-                btn.configure(text="✅", fg_color="#2CC985")
-                win.after(2000, lambda: btn.configure(text=original_text, fg_color=["#3a7ebf", "#1f538d"], state="normal"))
-            else:
-                btn.configure(text="❌", fg_color="#ff5555")
-                win.after(2000, lambda: btn.configure(text=original_text, fg_color=["#3a7ebf", "#1f538d"], state="normal"))
-                messagebox.showwarning("Предупреждение", "Не удалось загрузить модели.\nПроверьте, запущен ли Ollama.", parent=win)
+                messagebox.showwarning(localization_manager.get_text("warning"), "Не удалось загрузить модели.\nПроверьте, запущен ли Ollama.", parent=win)
                 
         except Exception as e:
             btn.configure(text="❌", state="normal")
             win.after(2000, lambda: btn.configure(text=original_text))
-            messagebox.showerror("Ошибка", f"Ошибка загрузки моделей:\n{e}", parent=win)
+            messagebox.showerror(localization_manager.get_text("error"), f"Ошибка загрузки моделей:\n{e}", parent=win)
     
-    ollama_refresh_btn = ctk.CTkButton(model_row, text="Загрузить", command=refresh_ollama_models, width=100)
+    ollama_refresh_btn = ctk.CTkButton(model_row, text=localization_manager.get_text("refresh_decks"), command=refresh_ollama_models, width=100)
     ollama_refresh_btn.pack(side="left", padx=10)
     
     # === OpenRouter настройки ===
@@ -178,7 +180,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     or_header_frame = ctk.CTkFrame(openrouter_frame, fg_color="transparent")
     or_header_frame.pack(fill="x", padx=10, pady=(10, 15))
     
-    ctk.CTkLabel(or_header_frame, text="🌐 OpenRouter (облачный AI)", font=("Roboto", 14, "bold")).pack(side="left")
+    ctk.CTkLabel(or_header_frame, text="🌐 " + localization_manager.get_text("openrouter_cloud"), font=("Roboto", 14, "bold")).pack(side="left")
     
     # Логика пресетов
     ai_presets = settings.get("AI_PRESETS", [])
@@ -187,7 +189,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     def get_preset_names():
         return [p.get("name", "Unknown") for p in ai_presets]
 
-    ctk.CTkLabel(or_header_frame, text="Пресеты:", text_color="gray").pack(side="left", padx=(20, 5))
+    ctk.CTkLabel(or_header_frame, text=localization_manager.get_text("openrouter_presets"), text_color="gray").pack(side="left", padx=(20, 5))
     
     def apply_preset(choice):
         for p in ai_presets:
@@ -197,17 +199,17 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
                  break
     
     p_names = get_preset_names()
-    if not p_names: p_names = ["(Нет пресетов)"]
+    if not p_names: p_names = [localization_manager.get_text("no_presets")]
     preset_combo = ctk.CTkComboBox(or_header_frame, values=p_names, command=apply_preset, width=150)
     preset_combo.pack(side="left")
     if not get_preset_names():
-        preset_combo.set("(Нет пресетов)")
+        preset_combo.set(localization_manager.get_text("no_presets"))
     else:
-        preset_combo.set("Загрузить...")
+        preset_combo.set(localization_manager.get_text("loading"))
     
     def delete_preset_action():
         current = preset_combo.get()
-        if not current or current in ["Загрузить...", "Нет пресетов", "(Нет пресетов)"]:
+        if not current or current in [localization_manager.get_text("loading"), "Нет пресетов", localization_manager.get_text("no_presets")]:
             return
         
         # Удаляем из списка
@@ -228,7 +230,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
             if get_preset_names():
                 preset_combo.set(names[0])
             else:
-                preset_combo.set("(Нет пресетов)")
+                preset_combo.set(localization_manager.get_text("no_presets"))
             
             # Обновляем звезду если нужно
             if openrouter_model_var.get() == deleted_model:
@@ -238,19 +240,19 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     trash_btn.pack(side="left", padx=(5, 0))
     
     # API Ключ
-    ctk.CTkLabel(openrouter_frame, text="API Ключ:").pack(anchor="w", padx=10)
+    ctk.CTkLabel(openrouter_frame, text=localization_manager.get_text("api_key_label")).pack(anchor="w", padx=10)
     openrouter_key_var = tk.StringVar(value=settings.get("OPENROUTER_API_KEY", ""))
     openrouter_key_entry = ctk.CTkEntry(openrouter_frame, textvariable=openrouter_key_var, width=400, show="•")
     openrouter_key_entry.pack(anchor="w", padx=10, pady=(0, 15))
     setup_text_widget_context_menu(openrouter_key_entry)
     
     # Выбор модели из списка
-    ctk.CTkLabel(openrouter_frame, text="Модель из списка:").pack(anchor="w", padx=10)
+    ctk.CTkLabel(openrouter_frame, text=localization_manager.get_text("model_label")).pack(anchor="w", padx=10)
     or_model_select_row = ctk.CTkFrame(openrouter_frame, fg_color="transparent")
     or_model_select_row.pack(fill="x", padx=10, pady=(0, 10))
     
-    openrouter_models_var = tk.StringVar(value="Нажмите 'Загрузить'")
-    openrouter_models_combo = ctk.CTkComboBox(or_model_select_row, variable=openrouter_models_var, values=["Нажмите 'Загрузить'"], width=320, state="readonly")
+    openrouter_models_var = tk.StringVar(value=localization_manager.get_text("loading"))
+    openrouter_models_combo = ctk.CTkComboBox(or_model_select_row, variable=openrouter_models_var, values=[localization_manager.get_text("loading")], width=320, state="readonly")
     openrouter_models_combo.pack(side="left")
     
     # Хранилище загруженных моделей
@@ -279,28 +281,26 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
                 
                 if model_options:
                     openrouter_models_combo.configure(values=model_options)
-                    openrouter_models_var.set(model_options[0])
-                    # Успех
-                    btn.configure(text="✅", fg_color="#2CC985")
+                    btn.configure(text="Пусто", fg_color="#ff5555")
                     win.after(2000, lambda: btn.configure(text=original_text, fg_color=["#3a7ebf", "#1f538d"], state="normal"))
                 else:
                     btn.configure(text="Пусто", fg_color="#ff5555")
                     win.after(2000, lambda: btn.configure(text=original_text, fg_color=["#3a7ebf", "#1f538d"], state="normal"))
             else:
-                messagebox.showerror("Ошибка", f"Ошибка загрузки: HTTP {response.status_code}", parent=win)
+                messagebox.showerror(localization_manager.get_text("error"), f"Ошибка загрузки: HTTP {response.status_code}", parent=win)
                 btn.configure(text=original_text, state="normal")
         except Exception as e:
             btn.configure(text="❌", state="normal")
             win.after(2000, lambda: btn.configure(text=original_text))
-            messagebox.showerror("Ошибка", f"Ошибка загрузки моделей:\n{e}", parent=win)
+            messagebox.showerror(localization_manager.get_text("error"), f"Ошибка загрузки моделей:\n{e}", parent=win)
     
-    openrouter_load_btn = ctk.CTkButton(or_model_select_row, text="Загрузить", command=load_openrouter_models, width=100)
+    openrouter_load_btn = ctk.CTkButton(or_model_select_row, text=localization_manager.get_text("refresh_decks"), command=load_openrouter_models, width=100)
     openrouter_load_btn.pack(side="left", padx=10)
     
     # Текущая модель (ручной ввод или выбранная)
 
     # Текущая модель (ручной ввод или выбранная) с кнопкой сохранения
-    ctk.CTkLabel(openrouter_frame, text="Текущая модель (используется для генерации):").pack(anchor="w", padx=10, pady=(5, 0))
+    ctk.CTkLabel(openrouter_frame, text=localization_manager.get_text("current_model_label")).pack(anchor="w", padx=10, pady=(5, 0))
     
     model_manual_row = ctk.CTkFrame(openrouter_frame, fg_color="transparent")
     model_manual_row.pack(fill="x", padx=10, pady=(0, 5))
@@ -365,9 +365,9 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
             preset_combo.set(current_model)
         else:
             if get_preset_names():
-                preset_combo.set("Загрузить...")
+                preset_combo.set(localization_manager.get_text("loading"))
             else:
-                preset_combo.set("(Нет пресетов)")
+                preset_combo.set(localization_manager.get_text("no_presets"))
             
     star_btn.configure(command=toggle_preset)
     
@@ -380,20 +380,23 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     
     openrouter_models_combo.configure(command=on_openrouter_model_select)
     
-    ctk.CTkLabel(openrouter_frame, text="💡 Выберите из списка или введите вручную. Нажмите ★ чтобы сохранить в пресеты.", text_color="#888888", font=("Roboto", 11)).pack(anchor="w", padx=10, pady=(0, 10))
+    # Hint label (localized)
+    ctk.CTkLabel(openrouter_frame, 
+                 text=localization_manager.get_text("select_or_enter_manually"), 
+                 text_color="#888888", font=("Roboto", 11)).pack(anchor="w", padx=10, pady=(0, 10))
     
     # === Google AI настройки ===
     google_frame = ctk.CTkFrame(provider_settings_container)
     
-    ctk.CTkLabel(google_frame, text="🔮 Google AI (Gemini)", font=("Roboto", 14, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
+    ctk.CTkLabel(google_frame, text="🔮 " + localization_manager.get_text("google_gemini"), font=("Roboto", 14, "bold")).pack(anchor="w", padx=10, pady=(10, 15))
     
-    ctk.CTkLabel(google_frame, text="API Ключ:").pack(anchor="w", padx=10)
+    ctk.CTkLabel(google_frame, text=localization_manager.get_text("api_key_label")).pack(anchor="w", padx=10)
     google_key_var = tk.StringVar(value=settings.get("GOOGLE_API_KEY", ""))
     google_key_entry = ctk.CTkEntry(google_frame, textvariable=google_key_var, width=400, show="•")
     google_key_entry.pack(anchor="w", padx=10, pady=(0, 15))
     setup_text_widget_context_menu(google_key_entry)
     
-    ctk.CTkLabel(google_frame, text="⚠️ Скоро будет доступно", text_color="#FFD700", font=("Roboto", 12)).pack(anchor="w", padx=10, pady=10)
+    ctk.CTkLabel(google_frame, text="⚠️ " + localization_manager.get_text("coming_soon"), text_color="#FFD700", font=("Roboto", 12)).pack(anchor="w", padx=10, pady=10)
     
     # Словарь фреймов провайдеров
     provider_frames = {
@@ -439,20 +442,18 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
                     btn.configure(text="✅ Успешно", fg_color="#2CC985")
                     win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
                 else:
-                    btn.configure(text="❌ Недоступно", fg_color="#ff5555")
-                    win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
-                    messagebox.showwarning("Предупреждение", "❌ Ollama недоступен.\nПроверьте, запущен ли сервер.", parent=win)
+                    messagebox.showwarning(localization_manager.get_text("warning"), "❌ Ollama недоступен.\nПроверьте, запущен ли сервер.", parent=win)
             except Exception as e:
-                btn.configure(text="❌ Ошибка", fg_color="#ff5555")
+                btn.configure(text="❌ " + localization_manager.get_text("error"), fg_color="#ff5555")
                 win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
-                messagebox.showerror("Ошибка", f"❌ Ошибка подключения:\n{e}", parent=win)
+                messagebox.showerror(localization_manager.get_text("error"), f"❌ {localization_manager.get_text('connection_failed')}:\n{e}", parent=win)
                 
         elif current_provider == "openrouter":
             api_key = openrouter_key_var.get().strip()
             if not api_key:
                 btn.configure(text="❌ Нет ключа", fg_color="#ff5555")
                 win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
-                messagebox.showwarning("Предупреждение", "Введите API ключ OpenRouter", parent=win)
+                messagebox.showwarning(localization_manager.get_text("warning"), localization_manager.get_text("enter_api_key_warning"), parent=win)
             else:
                 # В будущем можно делать реальный запрос на проверку баланса или моделей
                 # Пока что просто имитируем проверку "ключа не пусто"
@@ -464,14 +465,14 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
             if not api_key:
                 btn.configure(text="❌ Нет ключа", fg_color="#ff5555")
                 win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
-                messagebox.showwarning("Предупреждение", "Введите API ключ Google AI", parent=win)
+                messagebox.showwarning(localization_manager.get_text("warning"), localization_manager.get_text("enter_api_key_warning"), parent=win)
             else:
                 btn.configure(text="✅ Ключ сохранён", fg_color="#2CC985")
                 win.after(2000, lambda: btn.configure(text=original_text, fg_color="#1f538d", state="normal"))
                 
 
     
-    test_btn = ctk.CTkButton(tab_ai, text="🔗 Проверить подключение", command=test_connection, width=200, height=35, fg_color="#1f538d")
+    test_btn = ctk.CTkButton(tab_ai, text="🔗 " + localization_manager.get_text("check_connection"), command=test_connection, width=200, height=35, fg_color="#1f538d")
     test_btn.pack(pady=15)
 
     
@@ -494,16 +495,16 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         if not old_name or old_name not in presets:
             return
         
-        new_name = ask_string_dialog(win, "Переименовать", f"Новое имя для '{old_name}':", initial_value=old_name)
+        new_name = ask_string_dialog(win, localization_manager.get_text("rename"), f"{localization_manager.get_text('rename')} '{old_name}':", initial_value=old_name)
         if new_name and new_name != old_name:
             if rename_prompt_preset(old_name, new_name):
                 presets[new_name] = presets.pop(old_name)
                 names = sorted(presets.keys())
                 preset_combo.configure(values=names)
                 preset_var.set(new_name)
-                messagebox.showinfo("Успех", f"Пресет переименован в '{new_name}'.", parent=win)
+                messagebox.showinfo(localization_manager.get_text("success"), f"Пресет переименован в '{new_name}'.", parent=win)
     
-    ctk.CTkLabel(tab_prompts, text="Выберите пресет:").pack(anchor="w", padx=5)
+    ctk.CTkLabel(tab_prompts, text=localization_manager.get_text("preset_label")).pack(anchor="w", padx=5)
     
     # Инициализируем выбор из главного окна
     initial_preset = ""
@@ -521,15 +522,15 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     preset_combo = ctk.CTkComboBox(preset_row, variable=preset_var, values=preset_names)
     preset_combo.pack(side="left", fill="x", expand=True)
     
-    ctk.CTkButton(preset_row, text="✏️ переименовать", command=rename_preset, width=130).pack(side="left", padx=(10, 0))
+    ctk.CTkButton(preset_row, text="✏️ " + localization_manager.get_text("rename"), command=rename_preset, width=130).pack(side="left", padx=(10, 0))
     
-    ctk.CTkLabel(tab_prompts, text="Промпт перевода:").pack(anchor="w", padx=5)
+    ctk.CTkLabel(tab_prompts, text=localization_manager.get_text("translate_prompt_label")).pack(anchor="w", padx=5)
     translate_editor = ctk.CTkTextbox(tab_prompts, height=100)
     translate_editor.pack(fill="x", padx=5, pady=5)
     translate_editor.insert("1.0", settings.get("TRANSLATE_PROMPT", ""))
     setup_text_widget_context_menu(translate_editor)
     
-    ctk.CTkLabel(tab_prompts, text="Промпт контекста:").pack(anchor="w", padx=5)
+    ctk.CTkLabel(tab_prompts, text=localization_manager.get_text("context_prompt_label")).pack(anchor="w", padx=5)
     context_editor = ctk.CTkTextbox(tab_prompts, height=250)
     context_editor.pack(fill="both", expand=True, padx=5, pady=5)
     context_editor.insert("1.0", settings.get("CONTEXT_PROMPT", ""))
@@ -570,11 +571,11 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
             presets[name] = {"translate": tr, "context": ctx}
             sync_prompts(name)
             sync_with_main(name, tr, ctx)
-            messagebox.showinfo("Успех", f"Пресет '{name}' {'создан' if is_new else 'сохранен'}.", parent=win)
+            messagebox.showinfo(localization_manager.get_text("success"), f"Пресет '{name}' сохранен.", parent=win)
     
     def delete_preset():
         name = preset_var.get()
-        if name in presets and messagebox.askyesno("Удалить", f"Удалить '{name}'?", parent=win):
+        if name in presets and messagebox.askyesno(localization_manager.get_text("delete"), f"Удалить '{name}'?", parent=win):
             del presets[name]
             sync_prompts("")
             translate_editor.delete("1.0", tk.END)
@@ -582,17 +583,17 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     
     btn_frame = ctk.CTkFrame(tab_prompts, fg_color="transparent")
     btn_frame.pack(fill="x", padx=5, pady=10)
-    ctk.CTkButton(btn_frame, text="Сохранить", command=save_preset, width=100).pack(side="left", padx=5)
-    ctk.CTkButton(btn_frame, text="Новый промт", command=lambda: save_preset(True), width=120).pack(side="left", padx=5)
-    ctk.CTkButton(btn_frame, text="🗑 Удалить", command=delete_preset, width=100, fg_color="#ff5555", hover_color="#d63c3c").pack(side="left", padx=5)
+    ctk.CTkButton(btn_frame, text=localization_manager.get_text("save"), command=save_preset, width=100).pack(side="left", padx=5)
+    ctk.CTkButton(btn_frame, text=localization_manager.get_text("new_prompt"), command=lambda: save_preset(True), width=120).pack(side="left", padx=5)
+    ctk.CTkButton(btn_frame, text="🗑 " + localization_manager.get_text("delete"), command=delete_preset, width=100, fg_color="#ff5555", hover_color="#d63c3c").pack(side="left", padx=5)
     
     # === Font Settings ===
-    ctk.CTkLabel(tab_font, text="Семейство шрифта:").pack(anchor="w", padx=10, pady=(10, 5))
+    ctk.CTkLabel(tab_font, text=localization_manager.get_text("font_family_label")).pack(anchor="w", padx=10, pady=(10, 5))
     font_family_var = tk.StringVar(value=settings.get("FONT_FAMILY", "Roboto"))
     font_families = ["Roboto", "Arial", "Segoe UI", "Consolas", "Courier New", "Times New Roman", "Verdana", "Tahoma"]
     ctk.CTkComboBox(tab_font, variable=font_family_var, values=font_families, width=200).pack(anchor="w", padx=10, pady=(0, 10))
     
-    ctk.CTkLabel(tab_font, text="Размер шрифта:").pack(anchor="w", padx=10, pady=(10, 5))
+    ctk.CTkLabel(tab_font, text=localization_manager.get_text("font_size_label")).pack(anchor="w", padx=10, pady=(10, 5))
     font_size_var = tk.StringVar(value=str(settings.get("FONT_SIZE", 14)))
     
     size_frame = ctk.CTkFrame(tab_font, fg_color="transparent")
@@ -612,10 +613,10 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     
     size_slider.configure(command=update_size_label)
     
-    ctk.CTkLabel(tab_font, text="Пример текста:").pack(anchor="w", padx=10, pady=(20, 5))
+    ctk.CTkLabel(tab_font, text=localization_manager.get_text("preview_text_label")).pack(anchor="w", padx=10, pady=(20, 5))
     preview_text = ctk.CTkTextbox(tab_font, height=80)
     preview_text.pack(fill="x", padx=10, pady=(0, 10))
-    preview_text.insert("1.0", "Hallo! Das ist ein Beispieltext.\nПривет! Это пример текста.")
+    preview_text.insert("1.0", "Hallo! Das ist ein Beispieltext.\nПривет! Это пример текста." if localization_manager.language == "ru" else "Hello! This is a sample text.\nHallo! Das ist ein Beispieltext.")
     preview_text.configure(font=(font_family_var.get(), int(font_size_var.get())))
     setup_text_widget_context_menu(preview_text)
     
@@ -628,10 +629,14 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     font_family_var.trace_add("write", update_preview_font)
     
     # === Theme Settings ===
-    appearance_mode_map = {"Темная": "Dark", "Светлая": "Light", "Системная": "System"}
+    appearance_mode_map = {
+        localization_manager.get_text("appearance_dark"): "Dark",
+        localization_manager.get_text("appearance_light"): "Light",
+        localization_manager.get_text("appearance_system"): "System"
+    }
     appearance_mode_map_rev = {v: k for k, v in appearance_mode_map.items()}
     
-    ctk.CTkLabel(tab_theme, text="Режим отображения:").pack(anchor="w", padx=10, pady=10)
+    ctk.CTkLabel(tab_theme, text=localization_manager.get_text("appearance_mode")).pack(anchor="w", padx=10, pady=10)
     
     current_mode = theme_manager.appearance_mode
     appearance_mode_var = tk.StringVar(value=appearance_mode_map_rev.get(current_mode, "Темная"))
@@ -646,9 +651,34 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
     
     ctk.CTkOptionMenu(tab_theme, values=list(appearance_mode_map.keys()), command=change_appearance_mode, variable=appearance_mode_var).pack(padx=10, pady=10)
     
-    ctk.CTkLabel(tab_theme, text="Цветовая тема:").pack(anchor="w", padx=10, pady=10)
+    # Language Switcher
+    ctk.CTkLabel(tab_theme, text=localization_manager.get_text("language_label")).pack(anchor="w", padx=10, pady=10)
     
-    color_theme_map = {"Синяя": "blue", "Зеленая": "green", "Темно-синяя": "dark-blue"}
+    language_map = {"Русский": "ru", "English": "en"}
+    language_map_rev = {v: k for k, v in language_map.items()}
+    
+    current_lang = localization_manager.language
+    language_var = tk.StringVar(value=language_map_rev.get(current_lang, "Русский"))
+    
+    def change_language(new_lang_display):
+        new_lang_code = language_map.get(new_lang_display, "ru")
+        if new_lang_code != localization_manager.language:
+            localization_manager.language = new_lang_code
+            messagebox.showinfo(localization_manager.get_text("success"), 
+                                "Language changed. Please restart the application to apply changes fully." 
+                                if new_lang_code == "en" else 
+                                "Язык изменен. Пожалуйста, перезапустите приложение для полного применения изменений.", 
+                                parent=win)
+    
+    ctk.CTkOptionMenu(tab_theme, values=list(language_map.keys()), command=change_language, variable=language_var).pack(padx=10, pady=10)
+
+    ctk.CTkLabel(tab_theme, text=localization_manager.get_text("color_theme")).pack(anchor="w", padx=10, pady=10)
+    
+    color_theme_map = {
+        localization_manager.get_text("theme_blue"): "blue",
+        localization_manager.get_text("theme_green"): "green",
+        localization_manager.get_text("theme_dark_blue"): "dark-blue"
+    }
     color_theme_map_rev = {v: k for k, v in color_theme_map.items()}
     
     current_theme = theme_manager.color_theme
@@ -680,6 +710,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         settings["OPENROUTER_API_KEY"] = openrouter_key_var.get()
         settings["OPENROUTER_MODEL"] = openrouter_model_var.get()
         settings["GOOGLE_API_KEY"] = google_key_var.get()
+        settings["UI_LANGUAGE"] = language_map.get(language_var.get(), "ru")
         
         # Промпты
         settings["TRANSLATE_PROMPT"] = translate_editor.get("1.0", "end-1c")
@@ -771,7 +802,7 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         
         win.destroy()
     
-    ctk.CTkButton(win, text="ОК", command=save_and_close, width=150, height=35, fg_color="#2CC985", hover_color="#26AD72").pack(pady=10)
+    ctk.CTkButton(win, text=localization_manager.get_text("ok"), command=save_and_close, width=150, height=35, fg_color="#2CC985", hover_color="#26AD72").pack(pady=10)
 
 
 def apply_font_settings(family: str, size: int):

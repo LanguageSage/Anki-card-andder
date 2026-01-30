@@ -74,7 +74,8 @@ echo Для выхода нажмите Ctrl+C в этом окне.
 echo ========================================
 echo.
 
-python main.py
+start "" /b pythonw main.py
+exit
 
 REM Если приложение завершилось с ошибкой
 if !errorlevel! neq 0 (

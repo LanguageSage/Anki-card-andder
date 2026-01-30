@@ -26,6 +26,7 @@ from api.anki_api import anki_api
 from api.ai.ollama_provider import ollama_provider
 from ui.main_window import build_main_window
 from ui.settings_window import open_settings_window, apply_font_settings
+from core.localization import localization_manager
 
 
 # =============================================================================
@@ -36,7 +37,7 @@ def check_single_instance():
     mutex_name = "AnkiGermanHelperMutex"
     app_state.single_instance_mutex_handle = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
     if ctypes.windll.kernel32.GetLastError() == 183:
-        messagebox.showwarning("Anki German Helper", "Another instance is already running.")
+        messagebox.showwarning(localization_manager.get_text("app_title"), "Another instance is already running.")
         sys.exit(0)
 
 
@@ -163,7 +164,7 @@ def main():
                         app_state.force_replace_flag = True
                     else:
                         app_state.generation_running = False
-                        widgets["generate_btn"].configure(text="Генерировать", state="normal", fg_color="#2CC985", text_color="white")
+                        widgets["generate_btn"].configure(text=localization_manager.get_text("generate"), state="normal", fg_color="#2CC985", text_color="white")
                         return
 
                 widgets["stop_btn"].configure(state="normal")
@@ -205,7 +206,7 @@ def main():
             
             def _restore_btn():
                 if app_state.main_window_components["widgets"]["add_btn"].winfo_exists():
-                    app_state.main_window_components["widgets"]["add_btn"].configure(state="normal", text="В Anki")
+                    app_state.main_window_components["widgets"]["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
             root.after(1000, _restore_btn)
 
         threading.Thread(target=_async_audio_gen, daemon=True).start()

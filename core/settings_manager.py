@@ -83,7 +83,8 @@ def get_default_settings() -> Dict[str, Any]:
         "OPENROUTER_MODEL": "openai/gpt-4o-mini",
         "GOOGLE_API_KEY": "",
         "LAST_SETTINGS_TAB": "Озвучка",
-        "AI_PRESETS": []
+        "AI_PRESETS": [],
+        "UI_LANGUAGE": "ru"
     }
 
 
@@ -150,6 +151,11 @@ def load_settings(update_app_state: bool = True) -> Dict[str, Any]:
         app_state.openrouter_api_key = settings.get("OPENROUTER_API_KEY", "")
         app_state.openrouter_model = settings.get("OPENROUTER_MODEL", "openai/gpt-4o-mini")
         app_state.google_api_key = settings.get("GOOGLE_API_KEY", "")
+        
+        # Localization
+        from core.localization import localization_manager
+        ui_lang = settings.get("UI_LANGUAGE", "ru")
+        localization_manager.language = ui_lang
     
     return settings
 
