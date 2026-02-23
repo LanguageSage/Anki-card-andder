@@ -27,12 +27,12 @@ TTS_LANG = "de"
 def get_audio_folder():
     """Возвращает путь к папке для хранения аудиофайлов"""
     if getattr(sys, 'frozen', False):
-         # Если запущен из exe - сохраняем файлы рядом с exe
-        project_dir = os.path.dirname(sys.executable)
+         # Если запущен из exe - сохраняем файлы в папке user_files рядом с exe
+        base_dir = os.path.dirname(sys.executable)
     else:
-        # Если запущен из Python - используем директорию скрипта
-        project_dir = os.path.dirname(__file__)
-    return os.path.join(project_dir, "user_files")
+        # Если запущен из Python - используем корень проекта (на один уровень выше core)
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+    return os.path.join(base_dir, "user_files")
 
 def ensure_success_sound():
     """

@@ -13,6 +13,7 @@ from core.settings_manager import load_settings, DEFAULT_DECK_NAME
 from core import audio_utils
 from api.anki_api import anki_api
 from core.workers import add_to_anki_worker, format_clipboard_text
+from core.localization import localization_manager
 # NOTE: update_processing_indicator импортируется внутри функций чтобы избежать циклического импорта
 
 
@@ -107,8 +108,41 @@ def process_results_queue(root):
                 audio_path, False, app_state.force_replace_flag
             ), daemon=True).start()
             
+        elif message == "anki_ok":
+            update_processing_indicator("✅ Готово", animate=False)
+            root.after(2000, lambda: update_processing_indicator("", animate=False))
+            
+            # Разблокируем кнопку
+            if "add_btn" in widgets:
+                widgets["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
+            
+        elif message == "anki_error":
+            err_str = str(data)
+            update_processing_indicator("❌ Ошибка Anki", animate=False)
+            messagebox.showerror("Ошибка Anki", f"Не удалось добавить карточку:\n{err_str}", parent=root)
+            root.after(3000, lambda: update_processing_indicator("", animate=False))
+            
+            # Разблокируем кнопку
+            if "add_btn" in widgets:
+                widgets["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
+
+        elif message == "audio_error":
+            err_str = str(data)
+            update_processing_indicator("❌ Ошибка аудио", animate=False)
+            messagebox.showerror("Ошибка аудио", f"Не удалось сгенерировать озвучку:\n{err_str}", parent=root)
+            root.after(3000, lambda: update_processing_indicator("", animate=False))
+            
+            # Разблокируем кнопку
+            if "add_btn" in widgets:
+                widgets["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
+
         elif message == "anki_duplicate":
             phrase, translation, context, deck_name, audio_path, existing_ids = data
+            
+            # Разблокируем кнопку для выбора
+            if "add_btn" in widgets:
+                widgets["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
+
             if messagebox.askyesno("Дубликат обнаружен", 
                                    f"В Anki уже есть карточка с фразой:\n\"{phrase}\"\n\nУдалить старую версию и добавить новую?", 
                                    parent=root):

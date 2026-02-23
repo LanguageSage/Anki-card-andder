@@ -4,6 +4,7 @@
 """
 import os
 import requests
+import base64
 from typing import List, Optional, Dict, Any, Union
 
 # Константы
@@ -68,9 +69,10 @@ class AnkiAPI:
         return self._request("modelNames", timeout=1) or []
     
     def model_exists(self, model_name: str = None) -> bool:
-        """Проверяет существование модели"""
-        name = model_name or self.model_name
-        return name in self.get_model_names()
+        """Проверяет существование модели (регистронезависимо)"""
+        name = (model_name or self.model_name).strip().lower()
+        existing_models = [m.strip().lower() for m in self.get_model_names()]
+        return name in existing_models
     
     def get_model_field_names(self, model_name: str = None) -> List[str]:
         """Получает список полей модели"""
@@ -94,33 +96,28 @@ class AnkiAPI:
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             font-size: 20px;
             text-align: center;
-            color: #2c3e50;
-            background-color: #fdfdfd;
         }
         .phrase {
             font-size: 32px;
             font-weight: bold;
-            color: #1f538d;
             margin-bottom: 20px;
         }
         .translation {
             font-size: 24px;
-            color: #27ae60;
             margin-top: 20px;
             padding-top: 10px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #ccc;
         }
         .context {
             font-size: 16px;
-            color: #7f8c8d;
             font-style: italic;
             margin-top: 15px;
             text-align: left;
             display: inline-block;
             max-width: 90%;
             padding: 10px;
-            background: #f9f9f9;
             border-radius: 8px;
+            border: 1px solid #eee;
         }
         .sound { margin-top: 10px; }
         """
@@ -133,9 +130,18 @@ class AnkiAPI:
             }
         ]
 
-        if self.model_exists():
+        existing_models = self.get_model_names()
+        existing_models_lower = [m.lower().strip() for m in existing_models]
+        target_lower = self.model_name.lower().strip()
+
+        if target_lower in existing_models_lower:
+            # Находим оригинальное имя модели (которое в Anki)
+            original_index = existing_models_lower.index(target_lower)
+            actual_model_name = existing_models[original_index]
+            self.model_name = actual_model_name # Принимаем имя из Anki
+            
             # Если модель существует, проверяем поля
-            current_fields = self.get_model_field_names()
+            current_fields = self.get_model_field_names(actual_model_name)
             missing_fields = [f for f in required_fields if f not in current_fields]
             
             if not missing_fields:
@@ -299,25 +305,59 @@ class AnkiAPI:
         """
         clean_name = self.clean_deck_name(deck_name)
         
+        # Consolidate logging to the same file as workers.py
+        log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_files")
+        os.makedirs(log_dir, exist_ok=True)
+        log_path = os.path.join(log_dir, "audio_debug.log")
+        def _log(msg):
+            try:
+                import datetime
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(f"[{datetime.datetime.now()}] [API] {msg}\n")
+            except: pass
+            print(f"[API] {msg}")
+
         note = {
             "deckName": clean_name,
             "modelName": self.model_name,
             "fields": {
                 "Phrase": phrase.replace('\n', '<br>'),
                 "Translation": translation.replace('\n', '<br>'),
-                "Context": context.replace('\n', '<br>')
+                "Context": context.replace('\n', '<br>'),
+                "Sound": ""  # Explicitly include the Sound field
             },
             "tags": ["youtube", "german", "local-ai"]
         }
         
-        if audio_path:
-            note["audio"] = {
-                "path": audio_path,
-                "filename": os.path.basename(audio_path),
-                "fields": ["Sound"]
-            }
+        if audio_path and os.path.exists(audio_path):
+            try:
+                with open(audio_path, "rb") as f:
+                    audio_data = base64.b64encode(f.read()).decode("utf-8")
+                
+                # Check for correct field name casing
+                actual_fields = self.get_model_field_names()
+                _log(f"📋 Actual fields in model: {actual_fields}")
+                target_field = "Sound"
+                if "Sound" not in actual_fields:
+                    # Try to find a case-insensitive match or fallback to the first likely field
+                    for gf in actual_fields:
+                        if gf.lower() == "sound" or gf.lower() == "audio":
+                            target_field = gf
+                            _log(f"🔍 Found matching field: '{target_field}'")
+                            break
+                
+                _log(f"🔊 Attaching audio to field '{target_field}'. File: {os.path.basename(audio_path)}")
+                
+                note["audio"] = [{
+                    "data": audio_data,
+                    "filename": os.path.basename(audio_path),
+                    "fields": [target_field]
+                }]
+            except Exception as e:
+                _log(f"⚠️ Ошибка кодирования аудио в Base64: {e}")
         
-        self._request("addNote", {"note": note})
+        result = self._request("addNote", {"note": note})
+        _log(f"🎯 Anki response: {result}")
         return True
 
 

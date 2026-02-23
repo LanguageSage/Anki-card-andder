@@ -101,23 +101,49 @@ def get_ollama_models():
 def add_to_anki_worker(q, phrase, translation, context, deck_name, audio_path, 
                        confirm_delete=False, force_replace=False):
     """Воркер для добавления в Anki"""
+    # --- Debug logging to file ---
+    import datetime
+    log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_files")
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, "audio_debug.log")
+    def _log(msg):
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(f"[{datetime.datetime.now()}] {msg}\n")
+        except: pass
+        print(msg)
+    # --- End debug logging ---
+    
     try:
         if force_replace:
             existing_ids = anki_api.find_notes(phrase)
             if existing_ids:
-                print(f"🔄 Force replace: удаление {len(existing_ids)} старых заметок.")
+                _log(f"🔄 Force replace: удаление {len(existing_ids)} старых заметок.")
                 anki_api.delete_notes(existing_ids)
         
+        # Ensure absolute path
+        if audio_path and not os.path.isabs(audio_path):
+            audio_path = os.path.abspath(audio_path)
+            _log(f"⚠️ Audio path was relative, converted to: {audio_path}")
+        
+        _log(f"📦 add_to_anki_worker: deck={deck_name}, audio_path={audio_path}")
+        _log(f"   audio_path exists: {os.path.exists(audio_path) if audio_path else 'NO PATH'}")
+        if audio_path and os.path.exists(audio_path):
+            _log(f"   audio file size: {os.path.getsize(audio_path)} bytes")
+        
         anki_api.add_note(phrase, translation, context, deck_name, audio_path)
+        _log("✅ Нота успешно добавлена в Anki.")
         
         if audio_path and os.path.exists(audio_path):
             try:
+                time.sleep(0.1)  # Даем AnkiConnect время прочитать файл
                 os.remove(audio_path)
             except OSError:
                 pass
         
         q.put(("anki_ok", True))
     except Exception as e:
+        _log(f"❌ Ошибка добавления в Anki: {e}")
         err_msg = str(e).lower()
         if "duplicate" in err_msg and not confirm_delete and not force_replace:
             existing_ids = anki_api.find_notes(phrase)
@@ -130,7 +156,7 @@ def add_to_anki_worker(q, phrase, translation, context, deck_name, audio_path,
                 os.remove(audio_path)
             except OSError:
                 pass
-        q.put(("anki_error", e))
+        q.put(("anki_error", str(e)))
 
 
 def load_background_data_worker(q):

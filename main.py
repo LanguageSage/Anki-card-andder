@@ -192,22 +192,21 @@ def main():
         audio_enabled = app_state.main_window_components.get("vars", {}).get("audio_enabled_var", tk.BooleanVar(value=True)).get()
         
         def _async_audio_gen():
-            if audio_enabled:
-                audio_path = audio_utils.generate_audio(
-                    text, 
-                    app_state.tts.lang, 
-                    app_state.tts.speed_level, 
-                    app_state.tts.tld
-                )
-            else:
-                audio_path = None
-            
-            app_state.results_queue.put(("audio_ok", audio_path))
-            
-            def _restore_btn():
-                if app_state.main_window_components["widgets"]["add_btn"].winfo_exists():
-                    app_state.main_window_components["widgets"]["add_btn"].configure(state="normal", text="✅ " + localization_manager.get_text("add_to_anki"))
-            root.after(1000, _restore_btn)
+            try:
+                if audio_enabled:
+                    audio_path = audio_utils.generate_audio(
+                        text, 
+                        app_state.tts.lang, 
+                        app_state.tts.speed_level, 
+                        app_state.tts.tld
+                    )
+                else:
+                    audio_path = None
+                
+                app_state.results_queue.put(("audio_ok", audio_path))
+            except Exception as e:
+                print(f"❌ Critical error in audio generation: {e}")
+                app_state.results_queue.put(("audio_error", str(e)))
 
         threading.Thread(target=_async_audio_gen, daemon=True).start()
         
