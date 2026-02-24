@@ -204,6 +204,17 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     animation_label = ctk.CTkLabel(controls_frame, text="", font=("Roboto", 12), anchor="w")
     animation_label.pack(side="left", padx=5)
     root.animation_label = animation_label
+
+    import webbrowser
+    check_updates_label = ctk.CTkLabel(
+        controls_frame,
+        text=localization_manager.get_text("check_updates"),
+        font=("Roboto", 11, "underline"),
+        text_color=("#5a9fd4", "#5a9fd4"),
+        cursor="hand2"
+    )
+    check_updates_label.pack(side="right", padx=5)
+    check_updates_label.bind("<Button-1>", lambda e: webbrowser.open("https://example.com/update"))
     
     def on_prompt_select(choice):
         """Применяет выбранный промпт к приложению"""

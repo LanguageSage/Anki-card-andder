@@ -6,6 +6,7 @@
 TRANSLATIONS = {
     "ru": {
         "app_title": "Anki German Helper",
+        "check_updates": "Проверить обновления",
         "settings": "Настройки",
         "help": "Справка",
         "open_settings": "Открыть настройки",
@@ -106,6 +107,7 @@ TRANSLATIONS = {
     },
     "en": {
         "app_title": "Anki German Helper",
+        "check_updates": "Check for updates",
         "settings": "Settings",
         "help": "Help",
         "open_settings": "Open Settings",
