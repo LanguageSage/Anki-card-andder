@@ -146,12 +146,29 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     pin_btn = ctk.CTkButton(header_frame, text="📌", command=toggle_pin, width=40, height=30)
     pin_btn.pack(side="left", padx=(0, 10))
     widgets["pin_btn"] = pin_btn
-    
-    # Кнопка Help в хедере
+
+    # Логотип Wordy
+    try:
+        from PIL import Image
+        from core.settings_manager import get_resource_path
+        import os
+        logo_path = get_resource_path(os.path.join("assets", "logo.png"))
+        if os.path.exists(logo_path):
+            img = Image.open(logo_path)
+            aspect_ratio = img.width / img.height
+            new_width = int(30 * aspect_ratio)
+            logo_image = ctk.CTkImage(light_image=img, dark_image=img, size=(new_width, 30))
+            logo_label = ctk.CTkLabel(header_frame, text="", image=logo_image)
+            logo_label.pack(side="left", padx=5)
+            widgets["logo_label"] = logo_label
+    except Exception as e:
+        print(f"Ошибка загрузки логотипа: {e}")
+
+    # Кнопка Help в хедере (перемещена вправо)
     help_btn = ctk.CTkButton(header_frame, text=localization_manager.get_text("help"), width=50, height=30, 
                              fg_color="transparent", border_width=1, 
                              command=lambda: show_help_window("Главное окно", "Main_Window_Help.txt"))
-    help_btn.pack(side="left", padx=5)
+    help_btn.pack(side="right", padx=5)
     ToolTip(help_btn, localization_manager.get_text("help_tooltip"))
     
     sound_source = settings.get("SOUND_SOURCE", "original")

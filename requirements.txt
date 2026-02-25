@@ -5,3 +5,4 @@ customtkinter
 packaging
 numpy
 sounddevice
+Pillow

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lerne & Wordy - Экосистема изучения языков</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="blob-bg"></div>
+    <div class="blob-bg blob-2"></div>
+
+    <nav class="navbar glass-panel">
+        <div class="logo">
+            <img src="logo.png" alt="Wordy Logo" id="main-logo">
+        </div>
+        <div class="nav-links">
+            <a href="#wordy">Wordy Free</a>
+            <a href="#lerne">Lerne Premium</a>
+            <a href="#github">GitHub</a>
+        </div>
+        <a href="#downloads" class="btn-secondary">Скачать</a>
+    </nav>
+
+    <main>
+        <!-- Section: Wordy Free (Current Tool) -->
+        <section id="wordy" class="hero section-free">
+            <div class="badge">Бесплатно и открыто</div>
+            <h1 class="hero-title">Wordy: <span class="accent-free">Умный сборщик</span> для Anki</h1>
+            <p class="hero-subtitle">Классический инструмент (Anki-card-adder), который помогает тысячам студентов
+                автоматизировать создание карточек. Бесплатно, навсегда, с открытым исходным кодом.</p>
+
+            <div id="downloads" class="download-grid">
+                <a href="#" class="download-card glass-panel">
+                    <div class="os-icon">🪟</div>
+                    <div class="download-info">
+                        <span class="os-name">Windows</span>
+                        <span class="file-info">.exe | v1.5.0</span>
+                    </div>
+                </a>
+                <a href="#" class="download-card glass-panel">
+                    <div class="os-icon">🍎</div>
+                    <div class="download-info">
+                        <span class="os-name">Mac OS</span>
+                        <span class="file-info">.dmg | Universal</span>
+                    </div>
+                </a>
+                <a id="github" href="https://github.com/nimmaypum-jpg/Anki-card-andder"
+                    class="download-card glass-panel github-link">
+                    <div class="os-icon">🐙</div>
+                    <div class="download-info">
+                        <span class="os-name">Source Code</span>
+                        <span class="file-info">View on GitHub</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Lerne Premium Preview (The Future) -->
+        <section id="lerne" class="hero section-premium">
+            <div class="badge premium-badge">✨ Совершенно новая платформа</div>
+            <h1 class="hero-title">Lerne: <span class="accent-premium">Новое поколение</span></h1>
+            <p class="hero-subtitle">Это не просто обновление Anki-card-adder. Это полноценная экосистема, которая
+                заменяет собой всё. Интеллектуальный помощник, который учится вместе с вами.</p>
+
+            <div class="mockup-container glass-panel reveal-on-load premium-mockup">
+                <div class="mockup-header">
+                    <div class="dots"><span></span><span></span><span></span></div>
+                    <div class="mockup-title">Lerne Alpha Preview</div>
+                </div>
+                <div class="mockup-body">
+                    <div class="premium-preview-grid">
+                        <div class="preview-item">
+                            <div class="preview-icon">🧠</div>
+                            <h4>AI Mind Map</h4>
+                            <p>Визуализация ваших знаний по уровням CEFR.</p>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-icon">🎙️</div>
+                            <h4>Pro Audio</h4>
+                            <p>Генерация клонированных голосов носителей.</p>
+                        </div>
+                        <div class="preview-item">
+                            <div class="preview-icon">🖼️</div>
+                            <h4>AI Visuals</h4>
+                            <p>Создание уникальных ассоциаций через DALL-E 3.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="waitlist" class="waitlist-section glass-panel">
+            <h2>Не пропустите релиз Lerne</h2>
+            <p>Оставьте свою почту, чтобы получить уведомление о выходе новой платформы и эксклюзивные условия для
+                ранних пользователей.</p>
+            <form class="waitlist-form"
+                onsubmit="event.preventDefault(); alert('Спасибо! Мы записали вас в лист ожидания Lerne.');">
+                <input type="email" placeholder="example@gmail.com" required>
+                <button type="submit" class="btn-primary">Хочу ранний доступ</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Lerne & Wordy. Создано для тех, кто любит языки.</p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.hero, .download-card, .waitlist-section, .feature-card').forEach((el) => {
+            el.classList.add('reveal-on-scroll');
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

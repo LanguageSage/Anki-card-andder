@@ -95,6 +95,15 @@ def main():
     
     root = ctk.CTk()
     
+    # Установка иконки приложения
+    try:
+        icon_path = get_resource_path(os.path.join("assets", "icon.ico"))
+        if os.path.exists(icon_path):
+            root.iconbitmap(icon_path)
+    except Exception as e:
+        print(f"Ошибка загрузки иконки окна: {e}")
+    
+
     # Загрузка настроек
     settings = load_settings()
     

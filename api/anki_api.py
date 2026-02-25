@@ -102,6 +102,7 @@ class AnkiAPI:
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 20px;
+            color: #ffffff;
         }
         .translation {
             font-size: 24px;
@@ -116,9 +117,11 @@ class AnkiAPI:
             text-align: left;
             display: inline-block;
             max-width: 90%;
-            padding: 10px;
+            background-color: #333333;
+            color: #ffffff;
+            padding: 12px;
             border-radius: 8px;
-            border: 1px solid #eee;
+            border: 1px solid #444;
         }
         .sound { margin-top: 10px; }
         """

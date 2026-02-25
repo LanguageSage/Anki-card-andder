@@ -1,55 +1,59 @@
 @echo off
+setlocal
 chcp 65001 >nul
 echo ========================================
 echo   Установка зависимостей Wordy
 echo ========================================
 echo.
 
-REM Проверяем наличие Python
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo ❌ Python не найден! Установите Python 3.10+ с python.org
-    pause
-    exit /b 1
+set "PY_CMD=python"
+
+REM Ищем Python 3.11 как наиболее стабильный
+py -3.11 --version >nul 2>&1
+if not errorlevel 1 (
+    set "PY_CMD=py -3.11"
+    echo [ИНФО] Использование Python 3.11
+) else (
+    python --version >nul 2>&1
+    if errorlevel 1 (
+        echo [ОШИБКА] Python не найден! Установите Python 3.11+
+        pause
+        exit /b 1
+    )
+    echo [ИНФО] Использование Python по умолчанию
 )
 
 REM Если .venv существует, но сломано - удаляем
 if exist .venv\pyvenv.cfg (
-    echo Проверяем виртуальное окружение...
+    echo [ИНФО] Проверка виртуального окружения...
     .venv\Scripts\python.exe --version >nul 2>&1
     if errorlevel 1 (
-        echo ⚠️ Виртуальное окружение повреждено. Пересоздаём...
+        echo [ПРЕДУПРЕЖДЕНИЕ] Окружение повреждено. Пересоздаём...
         rmdir /s /q .venv
     )
 )
 
 REM Создаём .venv если его нет
 if not exist .venv (
-    echo 📦 Создаём виртуальное окружение...
-    python -m venv .venv
+    echo [ИНФО] Создание виртуального окружения...
+    %PY_CMD% -m venv .venv
     if errorlevel 1 (
-        echo ❌ Ошибка создания виртуального окружения!
+        echo [ОШИБКА] Не удалось создать окружение.
         pause
         exit /b 1
     )
 )
 
-echo ✅ Виртуальное окружение готово.
+echo [ОК] Окружение готово.
 echo.
 
-echo 📦 Устанавливаем зависимости...
-call .venv\Scripts\activate.bat
-pip install --upgrade pip >nul
-pip install -r requirements.txt
-pip install pyinstaller
+echo [ИНФО] Установка библиотек...
+.venv\Scripts\python.exe -m pip install --upgrade pip >nul
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\pip install pyinstaller
+
 echo.
 echo ✅ Все зависимости установлены!
 echo.
-echo ========================================
-echo   Готово! Для запуска: run_anki_helper.bat
-echo ========================================
-echo.
-echo Для сборки EXE:
-echo   .venv\Scripts\python.exe -m PyInstaller wordy.spec --noconfirm
-echo.
 pause
+exit /b
