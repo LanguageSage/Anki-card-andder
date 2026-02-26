@@ -1,6 +1,11 @@
 # Wordy (Anki German Helper) 🤖📚
 
-**Master German faster with AI-powered flashcards.**
+> [!TIP]
+> **✨ Discover Lerne - The Future of Language Learning!**
+> This is not just an Anki-card-adder update. It's a complete ecosystem that replaces everything. An intelligent assistant that learns with you.
+> [**Learn more on the Lerne website**](https://LanguageSage.github.io/Anki-card-andder/) (Free and Open Source)
+
+**Learn German faster with AI-powered flashcards.**
 
 Wordy is a smart assistant that automates the creation of high-quality Anki cards. It monitors your clipboard, uses advanced AI (Ollama/OpenRouter) to provide perfect translations and context, and adds them to Anki with just one click.
 
