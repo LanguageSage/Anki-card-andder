@@ -32,9 +32,14 @@ def process_clipboard_queue(root):
         tvars = app_state.main_window_components["vars"]
         app_state.main_window_components["original_phrase"] = new_text
         
+        widgets["german_text"].configure(text_color=("gray10", "gray90"))
         widgets["german_text"].delete("1.0", tk.END)
         widgets["german_text"].insert("1.0", format_clipboard_text(new_text))
+        
+        widgets["translation_text"].configure(text_color=("gray10", "gray90"))
         widgets["translation_text"].delete("1.0", tk.END)
+        
+        widgets["context_widget"].configure(text_color=("gray10", "gray90"))
         widgets["context_widget"].delete("1.0", tk.END)
         
         root.deiconify()
@@ -51,8 +56,19 @@ def process_clipboard_queue(root):
                     current_batch_text = batch_input.get("1.0", "end-1c").strip()
                     formatted_new_text = format_clipboard_text(new_text)
                     
+                    # Проверка на плейсхолдер
+                    is_placeholder = False
+                    if hasattr(app_state, 'batch_panel') and app_state.batch_panel:
+                        if current_batch_text == app_state.batch_panel.placeholder_text:
+                            is_placeholder = True
+                    
+                    if is_placeholder:
+                        batch_input.delete("1.0", "end")
+                        batch_input.configure(text_color=("gray10", "gray90"))
+                        batch_input.insert("1.0", formatted_new_text)
+                        print(f"📋 Собиратель: плейсхолдер заменен на текст ({len(formatted_new_text)} символов)")
                     # Проверка на дубликат в самом списке пакета
-                    if current_batch_text:
+                    elif current_batch_text:
                         existing_lines = [line.strip() for line in current_batch_text.split('\n')]
                         if formatted_new_text.strip() in existing_lines:
                             print(f"📋 Собиратель: дубликат проигнорирован ({formatted_new_text[:30]}...)")
@@ -67,9 +83,14 @@ def process_clipboard_queue(root):
 
         auto_gen_enabled = app_state.get_checkbox_value("auto_generate_var", default=False)
         if auto_gen_enabled:
-            print(f"🤖 Автогенерация включена, запуск генерации")
-            update_processing_indicator(animate=True)
-            app_state.main_window_components["generate_function"]()
+            # Ограничиваем автогенерацию только короткими фразами (до 100 слов)
+            word_count = len(new_text.split())
+            if word_count <= 100:
+                print(f"🤖 Автогенерация включена, запуск генерации")
+                update_processing_indicator(animate=True)
+                app_state.main_window_components["generate_function"]()
+            else:
+                print(f"⏩ Текст слишком длинный для автогенерации ({word_count} слов), только добавлено в список")
     except queue.Empty:
         pass
     except Exception as e:
@@ -91,15 +112,17 @@ def process_results_queue(root):
         if message == "ollama_ok":
             app_state.generation_running = False
             translation, context = data
+            widgets["translation_text"].configure(text_color=("gray10", "gray90"))
             widgets["translation_text"].delete("1.0", tk.END)
             widgets["translation_text"].insert("1.0", translation)
+            
+            widgets["context_widget"].configure(text_color=("gray10", "gray90"))
             widgets["context_widget"].delete("1.0", tk.END)
             widgets["context_widget"].insert("1.0", context)
             widgets["generate_btn"].configure(
                 text=localization_manager.get_text("generate"), state="normal",
                 fg_color="#2CC985", hover_color="#26AD72", text_color="white"
             )
-            widgets["stop_btn"].configure(state="disabled")
             update_processing_indicator("✅ Готово", animate=False)
             root.after(2000, lambda: update_processing_indicator("", animate=False))
             
@@ -116,9 +139,9 @@ def process_results_queue(root):
             if not is_conn:
                 messagebox.showerror(localization_manager.get_text("error"), err_str)
             widgets["generate_btn"].configure(
-                text=localization_manager.get_text("generate"), state="normal"
+                text=localization_manager.get_text("generate"), state="normal",
+                fg_color="#2CC985", hover_color="#26AD72", text_color="white"
             )
-            widgets["stop_btn"].configure(state="disabled")
             root.after(3000, lambda: update_processing_indicator("", animate=False))
             
         elif message == "audio_ok":

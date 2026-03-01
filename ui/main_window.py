@@ -351,16 +351,45 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     # ========================================
     # INPUT FIELDS
     # ========================================
-    widgets["german_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14))
+    german_placeholder = "Введите немецкую фразу или предложение здесь..."
+    translation_placeholder = "Здесь появится перевод..."
+    context_placeholder = "Здесь появится контекст или объяснение..."
+
+    widgets["german_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14), text_color="gray")
+    widgets["german_text"].insert("1.0", german_placeholder)
     widgets["german_text"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
+    
+    widgets["translation_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14), text_color="gray")
+    widgets["translation_text"].insert("1.0", translation_placeholder)
+    widgets["translation_text"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
+    
+    widgets["context_widget"] = ctk.CTkTextbox(main_frame, height=180, font=("Roboto", 12), text_color="gray")
+    widgets["context_widget"].insert("1.0", context_placeholder)
+    widgets["context_widget"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
+
+    def setup_placeholder(widget, placeholder):
+        def on_focus_in(event):
+            if widget.get("1.0", "end-1c").strip() == placeholder:
+                widget.delete("1.0", "end")
+                widget.configure(text_color=("gray10", "gray90"))
+        
+        def on_focus_out(event):
+            if not widget.get("1.0", "end-1c").strip():
+                widget.insert("1.0", placeholder)
+                widget.configure(text_color="gray")
+        
+        widget.bind("<FocusIn>", on_focus_in)
+        widget.bind("<FocusOut>", on_focus_out)
+
+    setup_placeholder(widgets["german_text"], german_placeholder)
+    setup_placeholder(widgets["translation_text"], translation_placeholder)
+    setup_placeholder(widgets["context_widget"], context_placeholder)
+
     widgets["clipboard_handlers"] = []
     widgets["clipboard_handlers"].append(setup_text_widget_context_menu(widgets["german_text"]))
-    
-    widgets["translation_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14))
-    widgets["translation_text"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
-    widgets["translation_text"].insert("1.0", localization_manager.get_text("placeholder_translation"))
     widgets["clipboard_handlers"].append(setup_text_widget_context_menu(widgets["translation_text"]))
-
+    widgets["clipboard_handlers"].append(setup_text_widget_context_menu(widgets["context_widget"]))
+    
     # ========================================
     # CONTROLS
     # ========================================
@@ -426,13 +455,6 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     ToolTip(widgets["prompt_combo"], localization_manager.get_text("prompt_saved", name=""))
 
     # ========================================
-    # CONTEXT WIDGET
-    # ========================================
-    widgets["context_widget"] = ctk.CTkTextbox(main_frame, height=180, font=("Roboto", 12))
-    widgets["context_widget"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
-    widgets["clipboard_handlers"].append(setup_text_widget_context_menu(widgets["context_widget"]))
-    
-    # ========================================
     # GENERATION CONTROLS
     # ========================================
     gen_frame = ctk.CTkFrame(main_frame)
@@ -461,18 +483,25 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     auto_label = ctk.CTkLabel(top_gen_row, text=localization_manager.get_text("auto_generate"), font=("Roboto", 12))
     auto_label.pack(side="left", padx=(0, 2))
     
+    def on_auto_generate_toggle():
+        if tvars.get("collector_mode_var") and tvars["collector_mode_var"].get():
+            messagebox.showwarning(
+                "Режим Собирателя", 
+                "Нельзя включить автогенерацию при активном режиме собирателя.\nСначала выключите '📋 Собиратель' в правой панели."
+            )
+            tvars["auto_generate_var"].set(False)
+            return
+        dependencies.update_auto_generate_flag()
+        save_all_ui_settings()
+
     tvars["auto_generate_var"] = tk.BooleanVar(value=settings.get("AUTO_GENERATE_ON_COPY", True))
-    tvars["auto_generate_var"].trace_add("write", dependencies.update_auto_generate_flag)
-    widgets["auto_generate_check"] = ctk.CTkCheckBox(top_gen_row, text="", variable=tvars["auto_generate_var"], width=20)
+    widgets["auto_generate_check"] = ctk.CTkCheckBox(top_gen_row, text="", variable=tvars["auto_generate_var"], width=20, command=on_auto_generate_toggle)
     widgets["auto_generate_check"].pack(side="left", padx=(0, 5))
     ToolTip(widgets["auto_generate_check"], localization_manager.get_text("auto_generate_tooltip"))
     dependencies.update_auto_generate_flag()
     
     widgets["generate_btn"] = ctk.CTkButton(top_gen_row, text=localization_manager.get_text("generate"), command=dependencies.generate_action, height=40, width=130)
     widgets["generate_btn"].pack(side="left", fill="x", expand=True)
-    
-    widgets["stop_btn"] = ctk.CTkButton(btns_frame, text=localization_manager.get_text("stop_btn"), command=dependencies.stop_generation, state="disabled", fg_color="#ff5555", hover_color="#d63c3c", width=130, height=40)
-    widgets["stop_btn"].pack(fill="x")
     
     # Индикатор текущей AI модели (кликабельный для быстрого доступа к настройкам AI)
     ai_indicator_frame = ctk.CTkFrame(gen_frame)
@@ -577,9 +606,6 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     
     widgets["prompt_status_label"] = ctk.CTkLabel(status_left_frame, text="", font=("Roboto", 10), text_color=("#888888", "#888888"))
     widgets["prompt_status_label"].pack(side="left", padx=0)
-    
-    widgets["cancel_btn"] = ctk.CTkButton(action_frame, text="❌ " + localization_manager.get_text("cancel"), command=lambda: root.iconify(), width=100, fg_color="#FF5555", hover_color="#D63C3C")
-    widgets["cancel_btn"].pack(side="right", padx=5)
     
     add_to_anki_frame = ctk.CTkFrame(action_frame, fg_color="transparent")
     add_to_anki_frame.pack(side="right", padx=5)

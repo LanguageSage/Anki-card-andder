@@ -174,15 +174,38 @@ def main():
     
     # Generate action wrapper
     def generate_action_wrapper():
-        phrase = app_state.main_window_components["widgets"]["german_text"].get("1.0", tk.END).strip()
-        if not phrase:
+        widgets = app_state.main_window_components.get("widgets", {})
+        
+        if app_state.generation_running:
+            try:
+                # Импортируем функцию остановки, если она есть в dependencies
+                if hasattr(dependencies, 'stop_generation'):
+                    dependencies.stop_generation()
+                else:
+                    app_state.generation_running = False
+                
+                if "generate_btn" in widgets:
+                    widgets["generate_btn"].configure(
+                        text=localization_manager.get_text("generate"), 
+                        state="normal", 
+                        fg_color="#2CC985", 
+                        hover_color="#26AD72", 
+                        text_color="white"
+                    )
+            except Exception as e:
+                print(f"Ошибка при отмене генерации: {e}")
             return
 
-        widgets = app_state.main_window_components["widgets"]
+        phrase = widgets.get("german_text").get("1.0", tk.END).strip()
         
+        # Проверка на плейсхолдер
+        german_placeholder = "Введите немецкую фразу или предложение здесь..."
+        if not phrase or phrase == german_placeholder:
+            return
+
         # Запуск таймера сразу
         app_state.generation_running = True
-        widgets["generate_btn"].configure(text="0s", state="disabled", fg_color="#FFD700", hover_color="#E6C200", text_color="black")
+        widgets["generate_btn"].configure(text="Отмена... 0s", state="normal", fg_color="#ff5555", hover_color="#d63c3c", text_color="white")
         
         start_time = time.time()
         def update_timer():
@@ -190,7 +213,8 @@ def main():
                 return
             elapsed = time.time() - start_time
             try:
-                widgets["generate_btn"].configure(text=f"{int(elapsed)}s", text_color="black")
+                dots = "." * (int(elapsed) % 3 + 1)
+                widgets["generate_btn"].configure(text=f"Отмена{dots} {int(elapsed)}s", text_color="white")
                 root.after(1000, update_timer)
             except Exception:
                 pass
@@ -207,10 +231,9 @@ def main():
                         app_state.force_replace_flag = True
                     else:
                         app_state.generation_running = False
-                        widgets["generate_btn"].configure(text=localization_manager.get_text("generate"), state="normal", fg_color="#2CC985", text_color="white")
+                        widgets["generate_btn"].configure(text=localization_manager.get_text("generate"), state="normal", fg_color="#2CC985", hover_color="#26AD72", text_color="white")
                         return
 
-                widgets["stop_btn"].configure(state="normal")
                 widgets["add_btn"].configure(fg_color="#FFD700", hover_color="#E6C200", text_color="black")
                 
                 with_context = app_state.get_checkbox_value("context_var", default=False)
@@ -227,7 +250,8 @@ def main():
     # On yes action wrapper
     def on_yes_action_wrapper():
         text = app_state.main_window_components["widgets"]["german_text"].get("1.0", tk.END).strip()
-        if not text:
+        german_placeholder = "Введите немецкую фразу или предложение здесь..."
+        if not text or text == german_placeholder:
             return
         
         app_state.main_window_components["widgets"]["add_btn"].configure(state="disabled", text="⏳ Озвучка...")

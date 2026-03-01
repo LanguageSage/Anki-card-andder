@@ -217,15 +217,19 @@ def clipboard_worker(q):
             
             if current != app_state.last_clipboard and current.strip():
                 word_count = len(current.split())
+                char_count = len(current)
                 has_letters = any(c.isalpha() for c in current)
                 
-                print(f"📋 Буфер изменился: слов={word_count}, текст: {current[:50]}...")
+                print(f"📋 Буфер изменился: слов={word_count}, символов={char_count}, текст: {current[:50]}...")
                 
-                if word_count <= 100 and has_letters:
+                # Увеличиваем лимит до 10000 символов для режима собирателя
+                if char_count <= 10000 and has_letters:
                     print(f"✅ Текст перехвачен, помещаем в очередь")
                     q.put(current)
                     app_state.last_clipboard = current
                 else:
+                    if char_count > 10000:
+                        print(f"⚠️ Текст слишком длинный ({char_count} симв.), игнорируем")
                     app_state.last_clipboard = current
             
         except Exception as e:

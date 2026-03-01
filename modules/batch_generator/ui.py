@@ -13,12 +13,12 @@ class BatchSidebarPanel(ctk.CTkFrame):
         
         # 1. Заголовок с кнопками очистки текста
         header_frame = ctk.CTkFrame(self, fg_color="transparent")
-        header_frame.pack(fill="x", pady=(10, 5), padx=5)
+        header_frame.pack(fill="x", pady=0, padx=5)
         
         # Кнопка очистки текста через ИИ
         self.clean_btn = ctk.CTkButton(
             header_frame, 
-            text="🧹 Очистить текст",
+            text="🧹 Подготовить текст",
             height=30,
             width=130,
             fg_color="#6366F1", 
@@ -57,6 +57,11 @@ class BatchSidebarPanel(ctk.CTkFrame):
                     hover_color="#26AD72",
                     text_color="white"
                 )
+                # Автоматически выключаем автогенерацию при включении собирателя
+                auto_gen_var = tvars.get("auto_generate_var")
+                if auto_gen_var:
+                    auto_gen_var.set(False)
+                    print("🤖 Автогенерация выключена (режим собирателя приоритетнее)")
             else:
                 self.collector_btn.configure(
                     text="📋 Собиратель: OFF", 
@@ -88,11 +93,25 @@ class BatchSidebarPanel(ctk.CTkFrame):
                 text_color="white"
             )
         
-        ctk.CTkLabel(self, text="Вставьте список фраз (каждая с новой строки):", font=("Roboto", 12)).pack(anchor="w", pady=(0, 5), padx=5)
-
         # 2. Поле ввода
-        self.batch_input = ctk.CTkTextbox(self, height=220, font=("Roboto", 14))
+        self.placeholder_text = "Вставьте список фраз (каждая с новой строки) или включите 'Собиратель'..."
+        self.batch_input = ctk.CTkTextbox(self, height=220, font=("Roboto", 14), text_color="gray")
+        self.batch_input.insert("1.0", self.placeholder_text)
         self.batch_input.pack(fill="both", expand=True, pady=(0, 10), padx=5)
+        
+        def on_focus_in(event):
+            if self.batch_input.get("1.0", "end-1c").strip() == self.placeholder_text:
+                self.batch_input.delete("1.0", "end")
+                self.batch_input.configure(text_color=("gray10", "gray90")) # Возвращаем нормальный цвет
+
+        def on_focus_out(event):
+            if not self.batch_input.get("1.0", "end-1c").strip():
+                self.batch_input.insert("1.0", self.placeholder_text)
+                self.batch_input.configure(text_color="gray")
+
+        self.batch_input.bind("<FocusIn>", on_focus_in)
+        self.batch_input.bind("<FocusOut>", on_focus_out)
+        
         setup_text_widget_context_menu(self.batch_input)
         
         # 3. Кнопки
@@ -108,7 +127,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
             if self.button_state == "start":
                 # Запуск обработки
                 text = self.batch_input.get("1.0", "end-1c")
-                if not text.strip():
+                if not text.strip() or text.strip() == self.placeholder_text:
                     return
                 
                 self.button_state = "pause"
@@ -349,8 +368,9 @@ class BatchSidebarPanel(ctk.CTkFrame):
                 # Обновляем поле ввода с очищенным текстом
                 def update_ui():
                     self.batch_input.delete("1.0", "end")
+                    self.batch_input.configure(text_color=("gray10", "gray90"))
                     self.batch_input.insert("1.0", cleaned_text)
-                    self.clean_btn.configure(state="normal", text="🧹 Очистить текст")
+                    self.clean_btn.configure(state="normal", text="🧹 Подготовить текст")
                     
                     # Добавляем запись в лог
                     self.batch_log.configure(state="normal")
@@ -363,7 +383,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
             except Exception as e:
                 error_msg = str(e)
                 def show_error():
-                    self.clean_btn.configure(state="normal", text="🧹 Очистить текст")
+                    self.clean_btn.configure(state="normal", text="🧹 Подготовить текст")
                     messagebox.showerror("Ошибка", f"Не удалось очистить текст:\n{error_msg}", parent=self)
                     
                     # Добавляем ошибку в лог
