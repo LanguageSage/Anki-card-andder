@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordy: Справка и документация</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .help-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            padding: 40px 0;
+            align-items: start;
+        }
+
+        .help-sidebar {
+            position: sticky;
+            top: 100px;
+            padding: 30px;
+        }
+
+        .help-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .help-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        .help-nav a:hover,
+        .help-nav a.active {
+            color: var(--accent-wordy);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .help-content {
+            padding: 40px;
+        }
+
+        .help-section {
+            margin-bottom: 80px;
+            scroll-margin-top: 120px;
+        }
+
+        .help-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            color: var(--accent-wordy);
+        }
+
+        .help-section h3 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+            color: var(--text-main);
+        }
+
+        .help-section p {
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .help-section ul {
+            margin-left: 20px;
+            margin-bottom: 24px;
+            color: var(--text-muted);
+        }
+
+        .help-section li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-premium);
+        }
+
+        .shortcut {
+            background: #334155;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border-bottom: 3px solid #1e293b;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        @media (max-width: 900px) {
+            .help-container {
+                grid-template-columns: 1fr;
+            }
+
+            .help-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob-bg"></div>
+    <div class="blob-bg blob-2"></div>
+
+    <nav class="navbar glass-panel">
+        <div class="logo">
+            <a href="index.html"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+                <img src="logo.png" alt="Wordy Logo" id="main-logo">
+                <span class="logo-text">Wordy</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html#features">Возможности</a>
+            <a href="index.html#download">Скачать</a>
+            <a href="https://github.com/LanguageSage/Anki-card-andder">GitHub</a>
+        </div>
+        <a href="index.html" class="btn-wordy">На главную</a>
+    </nav>
+
+    <main>
+        <div class="help-container">
+            <aside class="help-sidebar glass-panel">
+                <nav class="help-nav">
+                    <a href="#video">Видео-инструкция</a>
+                    <a href="#main" class="active">Главное окно</a>
+                    <a href="#ai">Настройка AI</a>
+                    <a href="#audio">Озвучка (TTS)</a>
+                    <a href="#prompts">Промпты</a>
+                    <a href="#batch">Пакетная генерация</a>
+                    <a href="#anki">Настройка Anki</a>
+                </nav>
+            </aside>
+
+            <div class="help-content glass-panel">
+                <!-- Видео-инструкция -->
+                <section id="video" class="help-section">
+                    <div class="badge">Быстрый старт</div>
+                    <h2>Видео-инструкция</h2>
+                    <p>Посмотрите короткий видео-обзор, чтобы быстро освоить основные функции Wordy.</p>
+                    <div class="video-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); position: relative; padding-bottom: 56.25%; height: 0;">
+                        <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                            poster="main_window.png">
+                            <source src="guide.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает встроенные видео.
+                        </video>
+                    </div>
+                </section>
+
+                <!-- Главное окно -->
+                <section id="main" class="help-section">
+                    <div class="badge">Базовые знания</div>
+                    <h2>Главное окно</h2>
+                    <p>Wordy предназначен для быстрой подготовки карточек Anki. Основной рабочий процесс выглядит так:
+                    </p>
+                    <ul>
+                        <li>Вы копируете текст (слово или фразу) в любом приложении.</li>
+                        <li>Wordy автоматически подхватывает его (если включен мониторинг).</li>
+                        <li>Нажимаете <code>Генерировать</code> для получения перевода и контекста.</li>
+                        <li>Нажимаете <code>Добавить в Anki</code> для создания карточки.</li>
+                    </ul>
+                    <h3>Горячие клавиши</h3>
+                    <p><span class="shortcut">Ctrl</span>+<span class="shortcut">Enter</span> — Быстрая генерация.</p>
+                    <p><span class="shortcut">Ctrl</span>+<span class="shortcut">S</span> — Сохранить в Anki.</p>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="main_window.png" alt="Главное окно Wordy" style="width: 100%; display: block;">
+                    </div>
+                </section>
+
+                <!-- Настройка AI -->
+                <section id="ai" class="help-section">
+                    <div class="badge">Продвинутое</div>
+                    <h2>Настройка AI</h2>
+                    <p>Wordy поддерживает три типа AI-провайдеров:</p>
+                    <h3>1. Ollama (Локально)</h3>
+                    <p>Самый приватный и бесплатный способ. Установите Ollama с <a href="https://ollama.com"
+                            style="color: var(--accent-wordy);">официального сайта</a>, запустите его и выберите модель
+                        (например, <code>llama3</code>) в настройках Wordy.</p>
+                    <h3>2. OpenRouter (Облако)</h3>
+                    <p>Доступ к топовым моделям (GPT-4, Claude) через API. Требуется API-ключ от OpenRouter.</p>
+                    <h3>3. Google Gemini</h3>
+                    <p>Быстрый и часто бесплатный (в лимитах Free Tier) вариант от Google.</p>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="ai_settings.png" alt="Настройки AI" style="width: 100%; display: block;">
+                    </div>
+                </section>
+
+                <!-- Озвучка -->
+                <section id="audio" class="help-section">
+                    <div class="badge">Мультимедиа</div>
+                    <h2>Озвучка (TTS)</h2>
+                    <p>Wordy использует Google TTS для генерации качественного произношения.</p>
+                    <ul>
+                        <li><strong>Скорость:</strong> Можно настроить в диапазоне от -10 до +10.</li>
+                        <li><strong>Диалект (TLD):</strong> Для английского можно выбрать <code>us</code>,
+                            <code>uk</code>, <code>ca</code> и другие.
+                        </li>
+                        <li><strong>Авто-воспроизведение:</strong> Если включено, Wordy будет озвучивать результат сразу
+                            после генерации.</li>
+                    </ul>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="audio_settings.png" alt="Настройки аудио" style="width: 100%; display: block;">
+                    </div>
+                </section>
+
+                <!-- Промпты -->
+                <section id="prompts" class="help-section">
+                    <div class="badge">Кастомизация</div>
+                    <h2>Промпты</h2>
+                    <p>Вы можете полностью изменить то, как AI обрабатывает ваши фразы.</p>
+                    <p>Используйте переменные в редакторе промптов, чтобы настроить формат перевода и объяснений. Это
+                        позволяет адаптировать Wordy под любой язык или стиль обучения.</p>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="prompts_settings.png" alt="Настройки промптов" style="width: 100%; display: block;">
+                    </div>
+                </section>
+
+                <!-- Пакетная генерация -->
+                <section id="batch" class="help-section">
+                    <div class="badge">Эффективность</div>
+                    <h2>Пакетная генерация</h2>
+                    <p>Wordy поддерживает массовую генерацию карточек. Это полезно, если у вас уже есть большой список
+                        слов для изучения.</p>
+                    <h3>Как это работает</h3>
+                    <ol style="margin-left: 20px; margin-bottom: 24px; color: var(--text-muted);">
+                        <li style="margin-bottom: 8px;">Нажмите кнопку <code>Пакет ➔</code> в правом верхнем углу окна,
+                            чтобы открыть правую панель.</li>
+                        <li style="margin-bottom: 8px;">Введите список слов или фраз (каждое с новой строки) в левое
+                            поле. Можно загрузить готовый текстовый файл <code>.txt</code>.</li>
+                        <li style="margin-bottom: 8px;">(Опционально) Настройте <strong>сдвиг задержки</strong>, чтобы
+                            не перегружать API (полезно при использовании бесплатных AI-сервисов).</li>
+                        <li style="margin-bottom: 8px;">Выберите промпт для перевода.</li>
+                        <li style="margin-bottom: 8px;">Нажмите старт.</li>
+                    </ol>
+                    <p>Wordy переведет все слова по очереди и сохранит результаты в CSV-файл, который затем можно легко
+                        импортировать в Anki.</p>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="batch_panel.png" alt="Пакетная генерация" style="width: 100%; display: block;">
+                    </div>
+                </section>
+
+                <!-- Anki -->
+                <section id="anki" class="help-section">
+                    <div class="badge">Интеграция</div>
+                    <h2>Настройка Anki</h2>
+                    <p>Для работы Wordy с Anki должен быть установлен аддон <strong>AnkiConnect</strong> (код:
+                        <code>2055492159</code>).
+                    </p>
+                    <p>Убедитесь, что Anki запущен перед тем, как нажимать кнопку "Добавить". Wordy автоматически
+                        определит ваши колоды и предложит выбрать нужную.</p>
+                    <div class="img-container"
+                        style="margin-top: 24px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); padding: 5px;">
+                        <img src="anki_settings_1.png" alt="Установка дополнения AnkiConnect"
+                            style="width: 100%; display: block; margin-bottom: 24px;">
+                        <img src="anki_settings_2.png" alt="Настройка AnkiConnect" style="width: 100%; display: block;">
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Wordy Project. Все права защищены.</p>
+    </footer>
+
+    <script>
+        // Скрипт для подсветки активного пункта меню при скролле
+        const sections = document.querySelectorAll('.help-section');
+        const navLinks = document.querySelectorAll('.help-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

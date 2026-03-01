@@ -77,9 +77,9 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         btn.place(relx=1.0, rely=0.0, anchor="ne", x=-5, y=5)
 
     # Добавляем кнопки помощи
-    add_help_btn(tab_tts, localization_manager.get_text("tab_audio"), "Settings_Audio_Help.txt")
-    add_help_btn(tab_ai, localization_manager.get_text("tab_ai"), "Settings_AI_Help.txt")
-    add_help_btn(tab_prompts, localization_manager.get_text("tab_prompts"), "Main_Window_Help.txt")
+    add_help_btn(tab_tts, localization_manager.get_text("tab_audio"), "audio")
+    add_help_btn(tab_ai, localization_manager.get_text("tab_ai"), "ai")
+    add_help_btn(tab_prompts, localization_manager.get_text("tab_prompts"), "prompts")
     
     # === TTS Settings (извлечено в отдельный модуль) ===
     tts_vars = create_tts_tab(tab_tts, settings, win)

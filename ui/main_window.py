@@ -92,28 +92,32 @@ def ask_string_dialog(parent, title, prompt, initial_value=""):
 
 
 def show_help_window(title, file_name):
-    """Открывает файл справки в стандартном редакторе (Блокнот)"""
+    """Открывает страницу справки в браузере"""
     try:
-        from core.settings_manager import get_user_dir, get_data_dir, get_resource_path
-        import subprocess
+        import webbrowser
         
-        # Если передали md, меняем на txt для совместимости
-        if file_name.endswith(".md"):
-            file_name = file_name.replace(".md", ".txt")
+        # Базовый URL документации
+        base_url = "https://LanguageSage.github.io/Anki-card-andder/help.html"
+        
+        # Определяем якорь (anchor) на основе имени запрашиваемого файла
+        anchor = ""
+        file_name_lower = file_name.lower()
+        if "audio" in file_name_lower or "tts" in file_name_lower:
+            anchor = "#audio"
+        elif "ai" in file_name_lower:
+            anchor = "#ai"
+        elif "anki" in file_name_lower:
+            anchor = "#anki"
+        elif "main" in file_name_lower:
+            anchor = "#main"
+        elif "prompts" in file_name_lower or "промпт" in file_name_lower:
+            anchor = "#prompts"
             
-        # Сначала ищем во внешней папке data
-        path = os.path.join(get_data_dir(), "документация", file_name)
+        # Формируем полный URL
+        url = f"{base_url}{anchor}"
         
-        if not os.path.exists(path):
-            # Если нет во внешней, ищем во внутренней (ресурсы EXE)
-            path = os.path.join(get_resource_path("документация"), file_name)
-        
-        if not os.path.exists(path):
-            messagebox.showerror(localization_manager.get_text("error"), f"Файл справки не найден:\n{file_name}")
-            return
-
-        # Запускаем в блокноте
-        subprocess.Popen(["notepad.exe", path])
+        # Открываем в браузере
+        webbrowser.open(url)
         
     except Exception as e:
         messagebox.showerror(localization_manager.get_text("error"), f"Не удалось открыть справку: {e}")
@@ -755,6 +759,21 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     
     root.start_animation = start_animation
     root.after(100, deferred_load)
+    
+    # ========================================
+    # GLOBAL HOTKEYS
+    # ========================================
+    def on_ctrl_enter(event=None):
+        dependencies.generate_action()
+        return "break"
+        
+    def on_ctrl_s(event=None):
+        dependencies.on_yes_action()
+        return "break"
+        
+    root.bind("<Control-Return>", on_ctrl_enter)
+    root.bind("<Control-s>", on_ctrl_s)
+    root.bind("<Control-S>", on_ctrl_s) # Для случая с Caps Lock или русской раскладки
     
     global_clipboard_manager = GlobalClipboardManager(root, widgets["clipboard_handlers"])
 
