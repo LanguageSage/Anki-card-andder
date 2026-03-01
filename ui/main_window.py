@@ -243,17 +243,157 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
                              fg_color="transparent", border_width=1, 
                              command=lambda: show_help_window("Главное окно", "Main_Window_Help.txt"))
     help_btn.pack(side="left", padx=(5, 5))
+    widgets["help_btn"] = help_btn
     ToolTip(help_btn, localization_manager.get_text("help_tooltip"))
+
+    # === LANGUAGE SELECTOR (выпадающий список по клику, справа от Help) ===
+    language_display = {"ru": "RU", "en": "EN"}
+    current_lang_code = localization_manager.language
+    
+    lang_popup = [None]
+    _lang_opening = [False]
+    
+    def show_lang_menu():
+        if _lang_opening[0]:
+            return
+        if lang_popup[0] is not None:
+            hide_lang_menu()
+            return
+        
+        _lang_opening[0] = True
+        
+        p = tk.Toplevel(root)
+        p.wm_overrideredirect(True)
+        p.attributes("-topmost", True)
+        p.configure(bg="#2b2b2b")
+        
+        btn = widgets["lang_btn"]
+        x = btn.winfo_rootx()
+        y = btn.winfo_rooty() + btn.winfo_height() + 2
+        p.geometry(f"+{x}+{y}")
+        
+        f = ctk.CTkFrame(p, fg_color="#333333", border_width=1, border_color="#555555", corner_radius=4)
+        f.pack(fill="both", expand=True)
+        
+        def set_language(lang_code):
+            hide_lang_menu()
+            if lang_code != localization_manager.language:
+                localization_manager.language = lang_code
+                try:
+                    current_settings = dependencies.load_settings()
+                    current_settings["UI_LANGUAGE"] = lang_code
+                    dependencies.save_settings(current_settings)
+                except Exception as e:
+                    print(f"⚠️ Ошибка сохранения языка: {e}")
+        
+        cur = localization_manager.language
+        b_ru = ctk.CTkButton(f, text="🇷🇺 Русский", width=100, height=28, 
+                             fg_color="transparent", hover_color="#444444",
+                             text_color="#2cc985" if cur == "ru" else "white", anchor="w",
+                             command=lambda: set_language("ru"))
+        b_ru.pack(pady=(2, 0), padx=2)
+        
+        b_en = ctk.CTkButton(f, text="🇬🇧 English", width=100, height=28, 
+                             fg_color="transparent", hover_color="#444444",
+                             text_color="#2cc985" if cur == "en" else "white", anchor="w",
+                             command=lambda: set_language("en"))
+        b_en.pack(pady=(0, 2), padx=2)
+        
+        lang_popup[0] = p
+        _lang_opening[0] = False
+        
+        def check_leave():
+            if lang_popup[0] is None:
+                return
+            try:
+                rx, ry = p.winfo_pointerxy()
+                bx, by = btn.winfo_rootx(), btn.winfo_rooty()
+                bw, bh = btn.winfo_width(), btn.winfo_height()
+                px, py = p.winfo_rootx(), p.winfo_rooty()
+                pw, ph = p.winfo_width(), p.winfo_height()
+                
+                in_btn = (bx-5 <= rx <= bx+bw+5) and (by-5 <= ry <= by+bh+5)
+                in_pop = (px-5 <= rx <= px+pw+5) and (py-5 <= ry <= py+ph+5)
+                
+                if not (in_btn or in_pop):
+                    hide_lang_menu()
+                else:
+                    p.after(100, check_leave)
+            except tk.TclError:
+                lang_popup[0] = None
+        
+        p.after(500, check_leave)
+    
+    def hide_lang_menu():
+        if lang_popup[0]:
+            try:
+                lang_popup[0].destroy()
+            except Exception:
+                pass
+            lang_popup[0] = None
+    
+    lang_btn = ctk.CTkButton(header_frame, text=f"🌐 {language_display.get(current_lang_code, 'RU')}", 
+                             width=55, height=30,
+                             fg_color="transparent", border_width=1,
+                             command=show_lang_menu)
+    lang_btn.pack(side="left", padx=(0, 5))
+    widgets["lang_btn"] = lang_btn
+    
+    # === Функция обновления текстов UI при смене языка ===
+    def refresh_ui_texts(new_lang):
+        """Обновляет все тексты главного окна после смены языка."""
+        # Обновить кнопку языка
+        lang_display = {"ru": "RU", "en": "EN"}
+        widgets["lang_btn"].configure(text=f"🌐 {lang_display.get(new_lang, 'RU')}")
+        
+        # Кнопка Help
+        widgets["help_btn"].configure(text=localization_manager.get_text("help"))
+        
+        # Настройки
+        widgets["font_settings_btn"].configure(text="⚙")
+        
+        # Чекбоксы и лейблы
+        if "context_check" in widgets:
+            widgets["context_check"].configure(text=localization_manager.get_text("context_enabled"))
+        if "pause_monitoring_check" in widgets:
+            widgets["pause_monitoring_check"].configure(text=localization_manager.get_text("clipboard_monitoring"))
+        
+        # Генерация
+        if "generate_btn" in widgets:
+            widgets["generate_btn"].configure(text=localization_manager.get_text("generate"))
+        
+        # Кнопки действий
+        if "add_btn" in widgets:
+            widgets["add_btn"].configure(text="✅ " + localization_manager.get_text("add_to_anki"))
+        
+        # AI модель
+        if "ai_model_label" in widgets:
+            from core.app_state import app_state
+            model_text = app_state.ollama_model or localization_manager.get_text("ai_not_configured")
+            widgets["ai_model_label"].configure(text=f"⚡ {model_text}")
+        
+        # Заголовок окна
+        root.title(localization_manager.get_text("app_title"))
+        
+        # Ссылка обновления
+        if "check_updates_label" in widgets:
+            widgets["check_updates_label"].configure(text=localization_manager.get_text("check_updates"))
+        
+        # Кнопка Пакет
+        if "batch_btn" in widgets:
+            widgets["batch_btn"].configure(text=localization_manager.get_text("batch_btn_label"))
+    
+    localization_manager.add_observer(refresh_ui_texts)
 
     # Кнопка Пакет в правой части хедера (как было раньше)
     # Используем закругления с одной стороны (15, 0, 0, 15) для обратного эффекта "стрелки"
-    batch_btn = ctk.CTkButton(header_frame, text="Пакет ➔", width=80, height=30, 
+    batch_btn = ctk.CTkButton(header_frame, text=localization_manager.get_text("batch_btn_label"), width=80, height=30, 
                              fg_color="#8B4513", hover_color="#A0522D",
                              corner_radius=10,
                              command=toggle_sidebar)
     batch_btn.pack(side="right", padx=(5, 5))
     widgets["batch_btn"] = batch_btn
-    ToolTip(batch_btn, "Открыть/скрыть панель пакетной обработки")
+    ToolTip(batch_btn, localization_manager.get_text("batch_tooltip"))
     
     sound_source = settings.get("SOUND_SOURCE", "original")
     tvars["sound_source_var"] = tk.StringVar(value=sound_source)
@@ -369,39 +509,62 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
     # ========================================
     # INPUT FIELDS
     # ========================================
-    german_placeholder = "Введите немецкую фразу или предложение здесь..."
-    translation_placeholder = "Здесь появится перевод..."
-    context_placeholder = "Здесь появится контекст или объяснение..."
+    # Используем списки для мутабельности при смене языка
+    placeholders = {
+        "german": [localization_manager.get_text("placeholder_german")],
+        "translation": [localization_manager.get_text("placeholder_translation")],
+        "context": [localization_manager.get_text("placeholder_context")],
+    }
 
     widgets["german_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14), text_color="gray")
-    widgets["german_text"].insert("1.0", german_placeholder)
+    widgets["german_text"].insert("1.0", placeholders["german"][0])
     widgets["german_text"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
     
     widgets["translation_text"] = ctk.CTkTextbox(main_frame, height=70, font=("Roboto", 14), text_color="gray")
-    widgets["translation_text"].insert("1.0", translation_placeholder)
+    widgets["translation_text"].insert("1.0", placeholders["translation"][0])
     widgets["translation_text"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
     
     widgets["context_widget"] = ctk.CTkTextbox(main_frame, height=180, font=("Roboto", 12), text_color="gray")
-    widgets["context_widget"].insert("1.0", context_placeholder)
+    widgets["context_widget"].insert("1.0", placeholders["context"][0])
     widgets["context_widget"].pack(pady=(0, 5), padx=5, fill="both", expand=True)
 
-    def setup_placeholder(widget, placeholder):
+    def setup_placeholder(widget, placeholder_holder):
+        """placeholder_holder — list с одним элементом [текст], мутабельный."""
         def on_focus_in(event):
-            if widget.get("1.0", "end-1c").strip() == placeholder:
+            if widget.get("1.0", "end-1c").strip() == placeholder_holder[0]:
                 widget.delete("1.0", "end")
                 widget.configure(text_color=("gray10", "gray90"))
         
         def on_focus_out(event):
             if not widget.get("1.0", "end-1c").strip():
-                widget.insert("1.0", placeholder)
+                widget.insert("1.0", placeholder_holder[0])
                 widget.configure(text_color="gray")
         
         widget.bind("<FocusIn>", on_focus_in)
         widget.bind("<FocusOut>", on_focus_out)
 
-    setup_placeholder(widgets["german_text"], german_placeholder)
-    setup_placeholder(widgets["translation_text"], translation_placeholder)
-    setup_placeholder(widgets["context_widget"], context_placeholder)
+    setup_placeholder(widgets["german_text"], placeholders["german"])
+    setup_placeholder(widgets["translation_text"], placeholders["translation"])
+    setup_placeholder(widgets["context_widget"], placeholders["context"])
+
+    def _update_placeholders(new_lang):
+        """Обновляет placeholder-тексты при смене языка."""
+        widget_map = {
+            "german": ("german_text", "placeholder_german"),
+            "translation": ("translation_text", "placeholder_translation"),
+            "context": ("context_widget", "placeholder_context"),
+        }
+        for key, (widget_name, loc_key) in widget_map.items():
+            old_ph = placeholders[key][0]
+            new_ph = localization_manager.get_text(loc_key)
+            placeholders[key][0] = new_ph
+            # Если виджет сейчас показывает старый placeholder, заменить
+            w = widgets.get(widget_name)
+            if w and w.get("1.0", "end-1c").strip() == old_ph:
+                w.delete("1.0", "end")
+                w.insert("1.0", new_ph)
+    
+    localization_manager.add_observer(_update_placeholders)
 
     widgets["clipboard_handlers"] = []
     widgets["clipboard_handlers"].append(setup_text_widget_context_menu(widgets["german_text"]))
@@ -431,6 +594,7 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
         cursor="hand2"
     )
     check_updates_label.pack(side="right", padx=5)
+    widgets["check_updates_label"] = check_updates_label
     check_updates_label.bind("<Button-1>", lambda e: webbrowser.open("https://LanguageSage.github.io/Anki-card-andder/"))
     
     def on_prompt_select(choice):
@@ -702,7 +866,7 @@ def populate_main_window(dependencies, root, settings, main_frame, widgets, tvar
         text_widget = widgets["translation_text"] if source == "translation" else widgets["german_text"]
         text = text_widget.get("1.0", tk.END).strip()
         
-        if not text or text == german_placeholder or text == translation_placeholder:
+        if not text or text == placeholders["german"][0] or text == placeholders["translation"][0]:
             if not text:
                 messagebox.showwarning(localization_manager.get_text("warning"), localization_manager.get_text("empty_field_warning"))
             return

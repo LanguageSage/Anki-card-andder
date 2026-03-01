@@ -104,6 +104,22 @@ TRANSLATIONS = {
         "no_api_key": "Нет ключа",
         "enter_api_key_warning": "Введите API ключ",
         "select_or_enter_manually": "💡 Выберите из списка или введите вручную. Нажмите ★ чтобы сохранить в пресеты.",
+        "batch_clean_text": "🧹 Подготовить текст",
+        "batch_collector_on": "📋 Собиратель: ON",
+        "batch_collector_off": "📋 Собиратель: OFF",
+        "batch_placeholder": "Вставьте список фраз (каждая с новой строки) или включите 'Собиратель'...",
+        "batch_start": "▶ Запустить",
+        "batch_pause": "⏸ Пауза",
+        "batch_continue": "▶ Продолжить",
+        "batch_stop": "⏹ Стоп",
+        "batch_log_title": "Журнал событий:",
+        "batch_btn_label": "Пакет ➔",
+        "batch_tooltip": "Открыть/скрыть панель пакетной обработки",
+        "batch_cleaning": "⏳ Очистка...",
+        "batch_edit_prompt_title": "Редактировать промпт для очистки текста",
+        "batch_edit_prompt_label": "Промпт для очистки текста:",
+        "batch_save": "💾 Сохранить",
+        "batch_cancel": "❌ Отмена",
     },
     "en": {
         "app_title": "Anki German Helper",
@@ -205,12 +221,29 @@ TRANSLATIONS = {
         "no_api_key": "No key",
         "enter_api_key_warning": "Enter API key",
         "select_or_enter_manually": "💡 Select from list or enter manually. Click ★ to save to presets.",
+        "batch_clean_text": "🧹 Prepare text",
+        "batch_collector_on": "📋 Collector: ON",
+        "batch_collector_off": "📋 Collector: OFF",
+        "batch_placeholder": "Paste a list of phrases (one per line) or enable 'Collector'...",
+        "batch_start": "▶ Start",
+        "batch_pause": "⏸ Pause",
+        "batch_continue": "▶ Continue",
+        "batch_stop": "⏹ Stop",
+        "batch_log_title": "Event log:",
+        "batch_btn_label": "Batch ➔",
+        "batch_tooltip": "Show/hide batch processing panel",
+        "batch_cleaning": "⏳ Cleaning...",
+        "batch_edit_prompt_title": "Edit text cleaning prompt",
+        "batch_edit_prompt_label": "Text cleaning prompt:",
+        "batch_save": "💾 Save",
+        "batch_cancel": "❌ Cancel",
     }
 }
 
 class LocalizationManager:
     def __init__(self):
         self._language = "ru"
+        self._observers = []
 
     @property
     def language(self):
@@ -218,8 +251,27 @@ class LocalizationManager:
 
     @language.setter
     def language(self, value):
-        if value in TRANSLATIONS:
+        if value in TRANSLATIONS and value != self._language:
             self._language = value
+            self._notify_observers()
+
+    def add_observer(self, callback):
+        """Регистрирует callback, вызываемый при смене языка."""
+        if callback not in self._observers:
+            self._observers.append(callback)
+
+    def remove_observer(self, callback):
+        """Удаляет callback из списка наблюдателей."""
+        if callback in self._observers:
+            self._observers.remove(callback)
+
+    def _notify_observers(self):
+        """Уведомляет всех наблюдателей о смене языка."""
+        for cb in self._observers:
+            try:
+                cb(self._language)
+            except Exception as e:
+                print(f"⚠️ Ошибка в observer локализации: {e}")
 
     def get_text(self, key, **kwargs):
         text = TRANSLATIONS.get(self._language, TRANSLATIONS["ru"]).get(key, key)
@@ -229,5 +281,10 @@ class LocalizationManager:
             except Exception:
                 pass
         return text
+
+    @staticmethod
+    def get_available_languages():
+        """Возвращает список доступных языков."""
+        return list(TRANSLATIONS.keys())
 
 localization_manager = LocalizationManager()

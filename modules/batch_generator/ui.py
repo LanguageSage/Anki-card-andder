@@ -4,6 +4,7 @@ import tkinter as tk
 import os
 import threading
 from core.clipboard_manager import setup_text_widget_context_menu
+from core.localization import localization_manager
 
 class BatchSidebarPanel(ctk.CTkFrame):
     def __init__(self, parent, start_callback, stop_callback):
@@ -18,7 +19,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         # Кнопка очистки текста через ИИ
         self.clean_btn = ctk.CTkButton(
             header_frame, 
-            text="🧹 Подготовить текст",
+            text=localization_manager.get_text("batch_clean_text"),
             height=30,
             width=130,
             fg_color="#6366F1", 
@@ -52,7 +53,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
             
             if new_state:
                 self.collector_btn.configure(
-                    text="📋 Собиратель: ON", 
+                    text=localization_manager.get_text("batch_collector_on"), 
                     fg_color="#2CC985", 
                     hover_color="#26AD72",
                     text_color="white"
@@ -64,7 +65,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
                     print("🤖 Автогенерация выключена (режим собирателя приоритетнее)")
             else:
                 self.collector_btn.configure(
-                    text="📋 Собиратель: OFF", 
+                    text=localization_manager.get_text("batch_collector_off"), 
                     fg_color="transparent", 
                     hover_color="#1f538d",
                     text_color=("gray10", "gray90")
@@ -72,7 +73,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
 
         self.collector_btn = ctk.CTkButton(
             header_frame, 
-            text="📋 Собиратель: OFF", 
+            text=localization_manager.get_text("batch_collector_off"), 
             width=130, 
             height=30,
             fg_color="transparent", 
@@ -87,14 +88,14 @@ class BatchSidebarPanel(ctk.CTkFrame):
         tvars = app_state.main_window_components.get("vars", {})
         if tvars.get("collector_mode_var") and tvars["collector_mode_var"].get():
             self.collector_btn.configure(
-                text="📋 Собиратель: ON", 
+                text=localization_manager.get_text("batch_collector_on"), 
                 fg_color="#2CC985", 
                 hover_color="#26AD72",
                 text_color="white"
             )
         
         # 2. Поле ввода
-        self.placeholder_text = "Вставьте список фраз (каждая с новой строки) или включите 'Собиратель'..."
+        self.placeholder_text = localization_manager.get_text("batch_placeholder")
         self.batch_input = ctk.CTkTextbox(self, height=220, font=("Roboto", 14), text_color="gray")
         self.batch_input.insert("1.0", self.placeholder_text)
         self.batch_input.pack(fill="both", expand=True, pady=(0, 10), padx=5)
@@ -132,7 +133,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
                 
                 self.button_state = "pause"
                 self.start_btn.configure(
-                    text="⏸ Пауза",
+                    text=localization_manager.get_text("batch_pause"),
                     fg_color="#F59E0B",
                     hover_color="#D97706"
                 )
@@ -145,7 +146,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
                 app_state.batch_paused = True
                 self.button_state = "continue"
                 self.start_btn.configure(
-                    text="▶ Продолжить",
+                    text=localization_manager.get_text("batch_continue"),
                     fg_color="#3B82F6",
                     hover_color="#2563EB"
                 )
@@ -155,7 +156,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
                 app_state.batch_paused = False
                 self.button_state = "pause"
                 self.start_btn.configure(
-                    text="⏸ Пауза",
+                    text=localization_manager.get_text("batch_pause"),
                     fg_color="#F59E0B",
                     hover_color="#D97706"
                 )
@@ -169,7 +170,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
             self.button_state = "start"
             
             self.start_btn.configure(
-                text="▶ Запустить",
+                text=localization_manager.get_text("batch_start"),
                 fg_color="#10B981",
                 hover_color="#059669"
             )
@@ -178,7 +179,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         
         self.start_btn = ctk.CTkButton(
             controls_frame, 
-            text="▶ Запустить", 
+            text=localization_manager.get_text("batch_start"), 
             height=45,
             fg_color="#10B981", 
             hover_color="#059669",
@@ -189,7 +190,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         
         self.stop_btn = ctk.CTkButton(
             controls_frame, 
-            text="⏹ Стоп", 
+            text=localization_manager.get_text("batch_stop"), 
             height=45,
             fg_color="#EF4444", 
             hover_color="#DC2626",
@@ -208,7 +209,8 @@ class BatchSidebarPanel(ctk.CTkFrame):
         self.progress_bar.set(0)
 
         # 5. Лог
-        ctk.CTkLabel(self, text="Журнал событий:", font=("Roboto", 12, "bold")).pack(anchor="w", pady=(10, 5), padx=5)
+        self.log_title_label = ctk.CTkLabel(self, text=localization_manager.get_text("batch_log_title"), font=("Roboto", 12, "bold"))
+        self.log_title_label.pack(anchor="w", pady=(10, 5), padx=5)
         self.batch_log = ctk.CTkTextbox(self, height=200, font=("Consolas", 11), state="disabled")
         self.batch_log.pack(fill="both", expand=True, padx=5, pady=(0, 10))
         setup_text_widget_context_menu(self.batch_log)
@@ -223,12 +225,40 @@ class BatchSidebarPanel(ctk.CTkFrame):
             "batch_progress_bar": self.progress_bar,
             "batch_log": self.batch_log
         })
+
+        # Регистрируем observer для смены языка
+        def _on_language_change(new_lang):
+            old_ph = self.placeholder_text
+            self.placeholder_text = localization_manager.get_text("batch_placeholder")
+            # Обновляем видимый текст если сейчас показан старый placeholder
+            current_text = self.batch_input.get("1.0", "end-1c").strip()
+            if current_text == old_ph:
+                self.batch_input.delete("1.0", "end")
+                self.batch_input.insert("1.0", self.placeholder_text)
+            self.clean_btn.configure(text=localization_manager.get_text("batch_clean_text"))
+            self.log_title_label.configure(text=localization_manager.get_text("batch_log_title"))
+            # Обновляем кнопки в зависимости от текущего состояния
+            if self.button_state == "start":
+                self.start_btn.configure(text=localization_manager.get_text("batch_start"))
+            elif self.button_state == "pause":
+                self.start_btn.configure(text=localization_manager.get_text("batch_pause"))
+            elif self.button_state == "continue":
+                self.start_btn.configure(text=localization_manager.get_text("batch_continue"))
+            self.stop_btn.configure(text=localization_manager.get_text("batch_stop"))
+            # Обновляем кнопку собирателя
+            col_var = tvars.get("collector_mode_var")
+            if col_var and col_var.get():
+                self.collector_btn.configure(text=localization_manager.get_text("batch_collector_on"))
+            else:
+                self.collector_btn.configure(text=localization_manager.get_text("batch_collector_off"))
+        
+        localization_manager.add_observer(_on_language_change)
         
     def reset_state(self):
         """Сбрасывает состояние кнопок к исходному"""
         self.button_state = "start"
         self.start_btn.configure(
-            text="▶ Запустить",
+            text=localization_manager.get_text("batch_start"),
             fg_color="#10B981",
             hover_color="#059669"
         )
@@ -276,13 +306,13 @@ class BatchSidebarPanel(ctk.CTkFrame):
         """Открывает окно редактирования промпта"""
         import os
         dialog = ctk.CTkToplevel(self)
-        dialog.title("Редактировать промпт для очистки текста")
+        dialog.title(localization_manager.get_text("batch_edit_prompt_title"))
         dialog.geometry("600x300")
         dialog.transient(self)
         dialog.grab_set()
         dialog.focus_force()
         
-        ctk.CTkLabel(dialog, text="Промпт для очистки текста:", font=("Roboto", 14, "bold")).pack(pady=(20, 10), padx=20)
+        ctk.CTkLabel(dialog, text=localization_manager.get_text("batch_edit_prompt_label"), font=("Roboto", 14, "bold")).pack(pady=(20, 10), padx=20)
         
         prompt_text = ctk.CTkTextbox(dialog, height=150, font=("Roboto", 12))
         prompt_text.pack(pady=10, padx=20, fill="both", expand=True)
@@ -306,7 +336,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         
         ctk.CTkButton(
             btn_frame, 
-            text="💾 Сохранить", 
+            text=localization_manager.get_text("batch_save"), 
             command=on_save, 
             font=("Roboto", 13), 
             width=120, 
@@ -317,7 +347,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         
         ctk.CTkButton(
             btn_frame, 
-            text="❌ Отмена", 
+            text=localization_manager.get_text("batch_cancel"), 
             command=dialog.destroy, 
             font=("Roboto", 13),
             width=120, 
@@ -346,7 +376,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
         full_request = f"{clean_prompt}\n\n{dirty_text}"
         
         # Блокируем кнопку
-        self.clean_btn.configure(state="disabled", text="⏳ Очистка...")
+        self.clean_btn.configure(state="disabled", text=localization_manager.get_text("batch_cleaning"))
         
         def worker():
             try:
@@ -370,7 +400,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
                     self.batch_input.delete("1.0", "end")
                     self.batch_input.configure(text_color=("gray10", "gray90"))
                     self.batch_input.insert("1.0", cleaned_text)
-                    self.clean_btn.configure(state="normal", text="🧹 Подготовить текст")
+                    self.clean_btn.configure(state="normal", text=localization_manager.get_text("batch_clean_text"))
                     
                     # Добавляем запись в лог
                     self.batch_log.configure(state="normal")
@@ -383,7 +413,7 @@ class BatchSidebarPanel(ctk.CTkFrame):
             except Exception as e:
                 error_msg = str(e)
                 def show_error():
-                    self.clean_btn.configure(state="normal", text="🧹 Подготовить текст")
+                    self.clean_btn.configure(state="normal", text=localization_manager.get_text("batch_clean_text"))
                     messagebox.showerror("Ошибка", f"Не удалось очистить текст:\n{error_msg}", parent=self)
                     
                     # Добавляем ошибку в лог

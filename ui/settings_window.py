@@ -113,7 +113,6 @@ def open_settings_window(parent, dependencies=None, settings=None, initial_tab=N
         settings["OPENROUTER_API_KEY"] = ai_vars["openrouter_key_var"].get()
         settings["OPENROUTER_MODEL"] = ai_vars["openrouter_model_var"].get()
         settings["GOOGLE_API_KEY"] = ai_vars["google_key_var"].get()
-        settings["UI_LANGUAGE"] = theme_vars["language_map"].get(theme_vars["language_var"].get(), "ru")
         
         # Промпты
         settings["TRANSLATE_PROMPT"] = prompts_vars["translate_editor"].get("1.0", "end-1c")
