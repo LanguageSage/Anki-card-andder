@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lerne: платформа для изучения языков</title>
+    <title>Wordy: Бесплатный помощник для Anki</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -19,112 +19,127 @@
 
     <nav class="navbar glass-panel">
         <div class="logo">
-            <img src="logo.png" alt="Lerne Logo" id="main-logo">
-            <span class="logo-text">Lerne</span>
+            <img src="logo.png" alt="Wordy Logo" id="main-logo">
+            <span class="logo-text">Wordy</span>
         </div>
         <div class="nav-links">
-            <a href="#wordy">Wordy App</a>
-            <a href="#lerne">Lerne Beta</a>
-            <a href="https://github.com/nimmaypum-jpg/Anki-card-andder">GitHub</a>
+            <a href="#features">Возможности</a>
+            <a href="#download">Скачать</a>
+            <a href="https://github.com/LanguageSage/Anki-card-andder">GitHub</a>
+            <a href="#lerne">Lerne Next-Gen</a>
         </div>
-        <a href="#waitlist" class="btn-primary">Ранний доступ</a>
+        <a href="#download" class="btn-wordy">Установить</a>
     </nav>
 
     <main>
         <!-- Hero Section -->
         <section class="hero">
-            <div class="badge premium-badge">🚀 Ранний доступ открыт</div>
-            <h1 class="hero-title">Lerne: <span class="accent-premium">платформа</span> <br> для изучения языков</h1>
-            <p class="hero-subtitle">Мы создаем экосистему, которая понимает, как вы учитесь. Начните с нашей бесплатной
-                утилиты Wordy и получите приоритет на бета-тест Lerne.</p>
+            <div class="badge premium-badge">✨ 100% Бесплатно и Open Source</div>
+            <h1 class="hero-title">Создавайте карточки Anki <br><span class="accent-wordy">в 10 раз быстрее</span></h1>
+            <p class="hero-subtitle">Wordy — это умный помощник, который автоматизирует добавление слов в Anki. 
+                Используйте мощь AI (Ollama/OpenRouter) для мгновенного перевода, контекста и озвучки.</p>
 
             <div class="cta-group">
-                <a href="#waitlist" class="btn-primary btn-large">Стать тестером (Бесплатно)</a>
-                <a href="#wordy" class="btn-wordy btn-large">Скачать Wordy</a>
+                <a href="#download" class="btn-wordy btn-large">Скачать Wordy (Windows)</a>
+                <a href="https://github.com/LanguageSage/Anki-card-andder" class="btn-secondary btn-large">
+                    <span>🐙 GitHub</span>
+                </a>
             </div>
         </section>
 
-        <!-- Section: Wordy Free -->
-        <section id="wordy" class="section glass-panel reveal-on-load">
-            <div class="section-content">
-                <div class="badge">Утилита для Anki</div>
-                <h2>Wordy: Умный помощник</h2>
-                <p>Ваша входная точка в мир Lerne. Мощный инструмент для автоматизации создания карточек Anki с
-                    использованием AI.</p>
+        <!-- Features Section -->
+        <section id="features" class="features-grid">
+            <div class="feature-card glass-panel reveal-on-load">
+                <div class="feature-icon">📋</div>
+                <h3>Захват в 1 клик</h3>
+                <p>Просто скопируйте слово в браузере (Ctrl+C). Wordy мгновенно подхватит его и подготовит карточку.</p>
+            </div>
 
-                <div class="cta-group" style="justify-content: flex-start; margin-top: 30px; flex-wrap: wrap;">
-                    <a href="https://github.com/LanguageSage/Anki-card-andder/releases/download/v1.0/Wordy_v1.0_Standard.zip"
-                        class="btn-primary btn-large" download>
-                        Windows Standard (.zip)
-                    </a>
-                    <a href="https://github.com/LanguageSage/Anki-card-andder/releases/download/v1.0/Wordy_v1.0_Portable.zip"
-                        class="btn-wordy btn-large" download>
-                        Windows Portable (.zip)
-                    </a>
-                    <a href="https://github.com/LanguageSage/Anki-card-andder" class="btn-secondary"
-                        style="margin-left: 10px; display: flex; align-items: center; gap: 8px;">
-                        <span>🐙 GitHub Source</span>
-                    </a>
+            <div class="feature-card glass-panel reveal-on-load">
+                <div class="feature-icon">🤖</div>
+                <h3>Локальный AI</h3>
+                <p>Полная поддержка Ollama. Используйте Llama 3 бесплатно и приватно на своем компьютере.</p>
+            </div>
+
+            <div class="feature-card glass-panel reveal-on-load">
+                <div class="feature-icon">🔊</div>
+                <h3>Авто-озвучка</h3>
+                <p>Качественная генерация аудио (TTS) для каждой фразы, чтобы сразу учить правильное произношение.</p>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download" class="section glass-panel reveal-on-scroll">
+            <div class="section-content text-center" style="width: 100%;">
+                <div class="badge">Версия 1.0</div>
+                <h2>Готов к работе</h2>
+                <p>Выберите подходящую версию для вашей системы Windows.</p>
+
+                <div class="cta-group" style="margin-top: 40px; flex-wrap: wrap;">
+                    <div class="download-option">
+                        <a href="https://github.com/LanguageSage/Anki-card-andder/releases/download/v1.0/Wordy_v1.0_Standard.zip"
+                            class="btn-wordy btn-large" download>
+                            Standard Edition
+                        </a>
+                        <p class="sub-text">Для постоянной установки</p>
+                    </div>
+                    <div class="download-option">
+                        <a href="https://github.com/LanguageSage/Anki-card-andder/releases/download/v1.0/Wordy_v1.0_Portable.zip"
+                            class="btn-secondary btn-large" download>
+                            Portable Edition
+                        </a>
+                        <p class="sub-text">Запуск с флешки или папки</p>
+                    </div>
                 </div>
-                <div class="telegram-cta reveal-on-scroll">
-                    <p>Все свежие новости, отчеты о разработке и опросы в нашем канале:</p>
+
+                <div class="telegram-cta" style="margin-top: 40px;">
+                    <p>Следите за обновлениями в Telegram:</p>
                     <a href="https://t.me/LanguageSage" class="btn-telegram">
-                        <span class="icon">✈️</span> Подписаться на Telegram
+                         Подписаться на канал
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- Section: Lerne Features Preview -->
-        <section id="lerne" class="features-grid">
-            <div class="feature-card glass-panel reveal-on-scroll">
-                <div class="feature-icon">🧠</div>
-                <h3>AI Mind Maps</h3>
-                <p>Визуализируйте свой прогресс по уровням CEFR. Смотрите, какие темы вы уже освоили, а где остались
-                    пробелы.</p>
-                <div class="status-tag">Скоро в Бете</div>
+        <!-- Section: Lerne (Future) - Subtle Presence -->
+        <section id="lerne" class="lerne-subtle-section reveal-on-scroll">
+            <hr class="divider">
+            <div class="badge">Проект будущего</div>
+            <h2>Lerne: Следующий этап развития</h2>
+            <p>Wordy был лишь началом. Мы строим <strong>Lerne</strong> — полноценную платформу для изучения языков 
+                с AI-картами знаний и клонированием голоса.</p>
+            
+            <div class="features-grid" style="margin-top: 40px;">
+                <div class="feature-card small-card glass-panel">
+                    <div class="feature-icon" style="font-size: 1.5rem;">🧠</div>
+                    <h4>Mind Maps</h4>
+                    <p>Визуализация знаний через уровни CEFR.</p>
+                </div>
+                <div class="feature-card small-card glass-panel">
+                    <div class="feature-icon" style="font-size: 1.5rem;">🎙️</div>
+                    <h4>Voice Cloning</h4>
+                    <p>Ваши карточки голосом носителей языка.</p>
+                </div>
             </div>
 
-            <div class="feature-card glass-panel reveal-on-scroll">
-                <div class="feature-icon">🎙️</div>
-                <h3>Voice Cloning</h3>
-                <p>Слушайте произношение, идентичное носителям языка. Мы используем AI для создания идеального звучание
-                    каждой фразы.</p>
-                <div class="status-tag">В разработке</div>
-            </div>
-
-            <div class="feature-card glass-panel reveal-on-scroll">
-                <div class="feature-icon">🎨</div>
-                <h3>AI Visuals</h3>
-                <p>Автоматическая генерация запоминающихся ассоциативных картинок для каждой карточки через диффузионные
-                    модели.</p>
-                <div class="status-tag">Скоро</div>
-            </div>
-        </section>
-
-        <!-- Waitlist / CTA Section -->
-        <section id="waitlist" class="waitlist-card glass-panel reveal-on-scroll">
-            <div class="waitlist-content">
-                <h2>Присоединяйтесь к будущему</h2>
-                <p>Оставьте свой Email, чтобы получить приглашение на закрытое тестирование Lerne и специальные условия
-                    "Early Bird" при запуске.</p>
-
+            <!-- Waitlist / CTA Section -->
+            <div id="waitlist" class="waitlist-inline">
+                <p>Хотите протестировать Lerne раньше всех?</p>
                 <form class="waitlist-form"
-                    onsubmit="event.preventDefault(); this.innerHTML='<div class=\'success-msg\'>✅ Спасибо! Мы свяжемся с вами в ближайшее время.</div>';">
+                    onsubmit="event.preventDefault(); this.innerHTML='<div class=\'success-msg\'>✅ Вы в списке! Мы напишем вам.</div>';">
                     <input type="email" placeholder="Ваш email" required>
-                    <button type="submit" class="btn-primary">Получить доступ</button>
+                    <button type="submit" class="btn-primary">Записаться в Beta</button>
                 </form>
-                <p class="sub-text">Никакого спама. Только важные обновления о релизе.</p>
             </div>
         </section>
     </main>
 
     <footer>
         <div class="footer-content">
-            <div class="footer-logo">Lerne & Wordy</div>
-            <p class="team-attribution">Проект разработан семейной командой: отцом-архитектором и сыном-маркетологом.
-                Сделано с любовью к языкам и Anki.</p>
-            <p>&copy; 2026. Проект с открытым сердцем и исходным кодом.</p>
+            <div class="footer-logo">Wordy / Lerne Project</div>
+            <p class="team-attribution">Разработано семейной командой: отцом-архитектором и сыном-маркетологом. 
+                Мы верим в свободный софт и эффективное обучение.</p>
+            <p>&copy; 2026. Open Source под лицензией MIT.</p>
         </div>
     </footer>
 
@@ -142,11 +157,10 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.reveal-on-scroll, .feature-card, .download-card').forEach((el) => {
+        document.querySelectorAll('.reveal-on-scroll, .feature-card, .section, .lerne-subtle-section').forEach((el) => {
             observer.observe(el);
         });
 
-        // Плавная прокрутка для ссылок
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();

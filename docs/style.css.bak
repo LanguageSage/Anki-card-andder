@@ -4,9 +4,11 @@
     --border-glass: rgba(255, 255, 255, 0.08);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --accent-premium: #a3e635; /* Lerne Lime */
-    --accent-wordy: #38bdf8; /* Wordy Blue */
-    --accent-wordy-hover: #7dd3fc;
+    --accent-premium: #a3e635;
+    /* Lerne Lime */
+    --accent-free: #38bdf8;
+    /* Wordy Blue */
+    --accent-free-hover: #7dd3fc;
     --accent-blue: #38bdf8;
     --accent-purple: #8b5cf6;
     --font-stack: 'Outfit', 'Inter', sans-serif;
@@ -41,7 +43,7 @@ body {
     width: 60vw;
     height: 60vw;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(7, 9, 15, 0) 70%);
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(7, 9, 15, 0) 70%);
     z-index: -1;
     pointer-events: none;
     animation: drift 25s ease-in-out infinite alternate;
@@ -50,13 +52,18 @@ body {
 .blob-bg.blob-2 {
     top: 50vh;
     left: 40vw;
-    background: radial-gradient(circle, rgba(163, 230, 53, 0.05) 0%, rgba(7, 9, 15, 0) 70%);
+    background: radial-gradient(circle, rgba(163, 230, 53, 0.08) 0%, rgba(7, 9, 15, 0) 70%);
     animation-delay: -12s;
 }
 
 @keyframes drift {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(10%, 10%) scale(1.1); }
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(10%, 10%) scale(1.1);
+    }
 }
 
 /* Glassmorphism Panels */
@@ -90,7 +97,9 @@ body {
     gap: 12px;
 }
 
-#main-logo { height: 40px; }
+#main-logo {
+    height: 40px;
+}
 
 .logo-text {
     font-size: 1.5rem;
@@ -111,7 +120,9 @@ body {
     font-size: 0.95rem;
 }
 
-.nav-links a:hover { color: var(--accent-wordy); }
+.nav-links a:hover {
+    color: var(--accent-premium);
+}
 
 /* Buttons */
 .btn-primary {
@@ -146,23 +157,18 @@ body {
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-wordy);
+    border-color: var(--text-muted);
 }
 
 .btn-wordy {
-    background: var(--accent-wordy);
+    background: var(--accent-free);
     color: #020617;
-    padding: 12px 24px;
-    border-radius: 100px;
-    text-decoration: none;
-    font-weight: 700;
     border: none;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
 }
 
 .btn-wordy:hover {
-    background: var(--accent-wordy-hover);
+    background: var(--accent-free-hover);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
 }
@@ -172,27 +178,17 @@ body {
     font-size: 1.1rem;
 }
 
-.btn-telegram {
-    background: #0088cc;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 100px;
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-block;
-    transition: opacity 0.3s;
-}
-
-.btn-telegram:hover { opacity: 0.9; }
-
 /* Main Content */
 main {
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 20px;
+    text-align: center;
 }
 
-.hero { padding: 120px 0 80px; text-align: center; }
+.hero {
+    padding: 120px 0 80px;
+}
 
 .badge {
     display: inline-block;
@@ -209,9 +205,9 @@ main {
 }
 
 .premium-badge {
-    background: rgba(56, 189, 248, 0.1);
-    color: var(--accent-wordy);
-    border-color: rgba(56, 189, 248, 0.2);
+    background: rgba(163, 230, 53, 0.1);
+    color: var(--accent-premium);
+    border-color: rgba(163, 230, 53, 0.2);
 }
 
 .hero-title {
@@ -222,8 +218,8 @@ main {
     letter-spacing: -2px;
 }
 
-.accent-wordy {
-    background: linear-gradient(135deg, var(--accent-wordy), var(--accent-purple));
+.accent-premium {
+    background: linear-gradient(135deg, var(--accent-premium), var(--accent-blue));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -242,12 +238,11 @@ main {
     justify-content: center;
 }
 
-.text-center { text-align: center; }
-
 /* Sections */
 .section {
-    padding: 80px 60px;
+    padding: 60px;
     margin-bottom: 80px;
+    text-align: left;
 }
 
 .section h2 {
@@ -267,43 +262,75 @@ main {
     padding: 40px;
     text-align: left;
     transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.feature-card:hover { transform: translateY(-10px); }
-
-.feature-icon { font-size: 2.5rem; margin-bottom: 20px; }
-
-.small-card { padding: 24px; }
-.small-card h4 { margin-bottom: 8px; }
-
-/* Download Helpers */
-.download-option { text-align: center; }
-.download-option .sub-text { margin-top: 12px; }
-
-/* Lerne Subtle Section */
-.lerne-subtle-section {
-    padding: 80px 0;
-    text-align: center;
+.feature-card:hover {
+    transform: translateY(-10px);
 }
 
-.lerne-subtle-section h2 { font-size: 2rem; margin: 24px 0 16px; }
-.lerne-subtle-section p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
-
-.divider {
-    border: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--border-glass), transparent);
-    margin-bottom: 60px;
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
 }
 
-.waitlist-inline {
-    margin-top: 60px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 32px;
+.status-tag {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    color: var(--text-muted);
 }
 
-.waitlist-inline p { font-weight: 600; color: var(--text-main); margin-bottom: 20px; }
+/* Downloads */
+.download-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.download-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+.btn-wordy-card:hover {
+    border-color: var(--accent-free);
+    background: rgba(56, 189, 248, 0.05);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+.os-icon {
+    font-size: 1.5rem;
+}
+
+.os-name {
+    display: block;
+    font-weight: 700;
+}
+
+.file-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Waitlist Card */
+.waitlist-card {
+    padding: 80px 40px;
+    margin-bottom: 120px;
+    background: radial-gradient(circle at top right, rgba(163, 230, 53, 0.05), transparent);
+}
 
 .waitlist-form {
     display: flex;
@@ -311,21 +338,41 @@ main {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-glass);
     border-radius: 100px;
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 540px;
+    margin: 40px auto 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.waitlist-form:focus-within {
+    border-color: var(--accent-premium);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 30px rgba(163, 230, 53, 0.15);
 }
 
 .waitlist-form input {
     flex: 1;
     background: transparent;
     border: none;
-    padding: 0 24px;
-    color: white;
+    padding: 14px 28px;
+    color: #fff;
+    font-size: 1rem;
     outline: none;
-    font-family: inherit;
+    font-family: var(--font-stack);
+    min-width: 0;
+    /* Prevents overflow in flex */
 }
 
-.success-msg { color: var(--accent-premium); font-weight: 600; padding: 10px; }
+.waitlist-form .btn-primary {
+    border-radius: 100px;
+    padding: 14px 32px;
+    white-space: nowrap;
+    height: 100%;
+}
+
+.sub-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
 
 /* Footer */
 footer {
@@ -346,27 +393,56 @@ footer {
 .footer-logo {
     font-size: 1.2rem;
     font-weight: 800;
-    color: var(--accent-wordy);
+    color: var(--accent-premium);
     margin-bottom: 10px;
 }
 
 /* Animations */
-.reveal-on-scroll, .feature-card, .section, .lerne-subtle-section {
+.reveal-on-scroll {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
     transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.visible {
+.reveal-on-scroll.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
+/* Final cleanup and responsiveness */
 @media (max-width: 768px) {
-    .hero-title { font-size: 3rem; }
-    .cta-group { flex-direction: column; }
-    .waitlist-form { flex-direction: column; border-radius: 20px; padding: 10px; }
-    .waitlist-form input { padding: 16px; text-align: center; }
-    .navbar { width: 95%; padding: 12px 20px; }
-    .nav-links { display: none; }
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .cta-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .waitlist-form {
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .waitlist-form input {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .waitlist-form .btn-primary {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .navbar {
+        width: 95%;
+        padding: 12px 20px;
+    }
+
+    .nav-links {
+        display: none;
+    }
 }
