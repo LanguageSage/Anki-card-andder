@@ -145,8 +145,8 @@ def process_text_for_speed(text, speed_level=0):
     return processed_text
 
 def generate_unique_filename(text, lang, speed_level, tld):
-    """Генерирует уникальное имя файла"""
-    file_data = f"{text}_{lang}_{speed_level}_{tld}_{time.time()}"
+    """Генерирует уникальное имя файла (без time.time() для кэширования)"""
+    file_data = f"{text}_{lang}_{speed_level}_{tld}"
     file_hash = hashlib.md5(file_data.encode('utf-8')).hexdigest()
     return f"anki_audio_{file_hash}.mp3"
 
@@ -179,6 +179,11 @@ def generate_audio(text, lang=None, speed_level=None, tld=None, debug=True):
     filename = generate_unique_filename(processed_text, lang, speed_level, tld)
     filepath = os.path.join(audio_folder, filename)
     
+    # Кэширование аудио
+    if os.path.exists(filepath):
+        if debug: print(f"✅ Взят из кэша: {filename}")
+        return filepath
+        
     try:
         from gtts import gTTS  # Lazy import
         tts = gTTS(text=processed_text, lang=lang, slow=gtts_slow, tld=tld)

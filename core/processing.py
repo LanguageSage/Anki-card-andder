@@ -125,6 +125,16 @@ def process_results_queue(root):
             )
             update_processing_indicator("✅ Готово", animate=False)
             root.after(2000, lambda: update_processing_indicator("", animate=False))
+
+            # Фоновая предзагрузка аудио для мгновенного добавления
+            german_phrase = widgets["german_text"].get("1.0", tk.END).strip()
+            audio_enabled = tvars.get("audio_enabled_var", tk.BooleanVar(value=True)).get()
+            if audio_enabled and german_phrase:
+                def prefetch():
+                    audio_utils.generate_audio(
+                        german_phrase, app_state.tts.lang, app_state.tts.speed_level, app_state.tts.tld, debug=False
+                    )
+                threading.Thread(target=prefetch, daemon=True).start()
             
             auto_add_var = tvars.get("auto_add_to_anki_var")
             if auto_add_var and auto_add_var.get():

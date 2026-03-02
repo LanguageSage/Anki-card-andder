@@ -62,11 +62,22 @@ def build_header(root, main_frame, widgets, tvars, settings, dependencies, toggl
     _build_audio_controls(root, header_frame, widgets, tvars, settings, dependencies, save_all_ui_settings)
 
     # === SETTINGS BUTTON ===
+    try:
+        from PIL import Image
+        from core.settings_manager import get_resource_path
+        settings_icon_path = get_resource_path(os.path.join("assets", "settings_v2.png"))
+        settings_img = ctk.CTkImage(light_image=Image.open(settings_icon_path), dark_image=Image.open(settings_icon_path), size=(20, 20))
+    except Exception as e:
+        print("Error loading settings icon:", e)
+        settings_img = None
+
     widgets["font_settings_btn"] = ctk.CTkButton(
-        header_frame, text="⚙", width=40, height=30,
-        command=lambda: dependencies.open_settings_window(root, dependencies)
+        header_frame, text="" if settings_img else "⚙",
+        image=settings_img, width=40, height=30,
+        command=lambda: dependencies.open_settings_window(root, dependencies),
+        fg_color="transparent", hover_color="#444444"
     )
-    widgets["font_settings_btn"].pack(side="right", padx=(5, 0))
+    widgets["font_settings_btn"].pack(side="right", padx=(5, 30))
     ToolTip(widgets["font_settings_btn"], localization_manager.get_text("open_settings"))
 
     # === UI TEXT REFRESH (language change observer) ===
@@ -75,7 +86,8 @@ def build_header(root, main_frame, widgets, tvars, settings, dependencies, toggl
         lang_display = {"ru": "RU", "en": "EN"}
         widgets["lang_btn"].configure(text=f"🌐 {lang_display.get(new_lang, 'RU')}")
         widgets["help_btn"].configure(text=localization_manager.get_text("help"))
-        widgets["font_settings_btn"].configure(text="⚙")
+        if not widgets["font_settings_btn"].cget("image"):
+            widgets["font_settings_btn"].configure(text="⚙")
 
         if "context_check" in widgets:
             widgets["context_check"].configure(text=localization_manager.get_text("context_enabled"))
@@ -175,7 +187,7 @@ def _build_audio_controls(root, header_frame, widgets, tvars, settings, dependen
     )
     widgets["font_sound_btn"].image_active = audio_active_img
     widgets["font_sound_btn"].image_inactive = audio_inactive_img
-    widgets["font_sound_btn"].pack(side="right", padx=5)
+    widgets["font_sound_btn"].pack(side="right", padx=(0, 5))
     ToolTip(widgets["font_sound_btn"], localization_manager.get_text("play_audio"))
 
     # Popup выбора источника аудио
@@ -216,7 +228,7 @@ def _build_audio_controls(root, header_frame, widgets, tvars, settings, dependen
         header_frame, text="", variable=tvars["audio_enabled_var"],
         width=24, command=toggle_audio_btn_state
     )
-    widgets["audio_enabled_check"].pack(side="right", padx=5)
+    widgets["audio_enabled_check"].pack(side="right", padx=(5, 0))
     ToolTip(widgets["audio_enabled_check"], localization_manager.get_text("audio_enabled_tooltip"))
     toggle_audio_btn_state()
 
