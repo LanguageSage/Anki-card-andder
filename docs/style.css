@@ -167,6 +167,25 @@ body {
     box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
 }
 
+.btn-accent {
+    background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    text-decoration: none;
+    font-weight: 700;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    display: inline-block;
+}
+
+.btn-accent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    filter: brightness(1.1);
+}
+
 .btn-large {
     padding: 16px 36px;
     font-size: 1.1rem;
