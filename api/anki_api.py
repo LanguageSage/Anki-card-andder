@@ -144,6 +144,13 @@ class AnkiAPI:
             
             # Если модель существует, проверяем поля
             current_fields = self.get_model_field_names(actual_model_name)
+            
+            # ВАЖНО: Если список полей пуст, хотя модель найдена — это скорее всего глюк AnkiConnect (таймаут).
+            # Не пытаемся "добавлять" поля в этом случае, чтобы не сломать структуру.
+            if not current_fields:
+                print(f"⚠️ Не удалось получить список полей для '{self.model_name}'. Пропуск настройки полей.")
+                return True
+                
             missing_fields = [f for f in required_fields if f not in current_fields]
             
             if missing_fields:
@@ -157,6 +164,11 @@ class AnkiAPI:
                         print(f"✅ Поле '{field}' добавлено.")
                     except Exception as e:
                         print(f"❌ Ошибка добавления поля '{field}': {e}")
+                # Если были изменения полей, то стили и шаблоны обновим ниже.
+            elif target_lower in [m.lower().strip() for m in existing_models]:
+                # Если поля на месте и модель не новая — не спамим обновлениями шаблонов без нужды
+                # Это предотвращает временное "исчезновение" полей в интерфейсе Anki при каждом запуске
+                return True
             
             # Также обновляем CSS и шаблоны на всякий случай
             try:
@@ -326,30 +338,37 @@ class AnkiAPI:
         
         if audio_path and os.path.exists(audio_path):
             try:
+                # По просьбе пользователя убрана проверка на пустой файл (размер > 0).
+                # Это позволит видеть текст ошибки AnkiConnect прямо в поле для отладки.
                 with open(audio_path, "rb") as f:
                     audio_data = base64.b64encode(f.read()).decode("utf-8")
                 
-                # Check for correct field name casing
-                actual_fields = self.get_model_field_names()
-                _log(f"📋 Actual fields in model: {actual_fields}")
-                target_field = "Sound"
-                if "Sound" not in actual_fields:
-                    # Try to find a case-insensitive match or fallback to the first likely field
-                    for gf in actual_fields:
-                        if gf.lower() == "sound" or gf.lower() == "audio":
-                            target_field = gf
-                            _log(f"🔍 Found matching field: '{target_field}'")
-                            break
-                
-                _log(f"🔊 Attaching audio to field '{target_field}'. File: {os.path.basename(audio_path)}")
-                
-                note["audio"] = [{
-                    "data": audio_data,
-                    "filename": os.path.basename(audio_path),
-                    "fields": [target_field]
-                }]
+                if not audio_data:
+                    _log(f"⚠️ Ошибка кодирования аудио: пустые данные.")
+                else:
+                    # Check for correct field name casing
+                    actual_fields = self.get_model_field_names()
+                    _log(f"📋 Actual fields in model: {actual_fields}")
+                    target_field = "Sound"
+                    
+                    if actual_fields:
+                        if "Sound" not in actual_fields:
+                            # Try to find a case-insensitive match or fallback to the first likely field
+                            for gf in actual_fields:
+                                if gf.lower() == "sound" or gf.lower() == "audio":
+                                    target_field = gf
+                                    _log(f"🔍 Found matching field: '{target_field}'")
+                                    break
+                    
+                    _log(f"🔊 Attaching audio to field '{target_field}'. File: {os.path.basename(audio_path)}")
+                    
+                    note["audio"] = [{
+                        "data": audio_data,
+                        "filename": os.path.basename(audio_path),
+                        "fields": [target_field]
+                    }]
             except Exception as e:
-                _log(f"⚠️ Ошибка кодирования аудио в Base64: {e}")
+                _log(f"⚠️ Ошибка обработки аудио файла: {e}")
         
         result = self._request("addNote", {"note": note})
         _log(f"🎯 Anki response: {result}")

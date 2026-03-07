@@ -145,10 +145,12 @@ def process_text_for_speed(text, speed_level=0):
     return processed_text
 
 def generate_unique_filename(text, lang, speed_level, tld):
-    """Генерирует уникальное имя файла (без time.time() для кэширования)"""
+    """Генерирует уникальное имя файла с использованием хэша и микросекунд для предотвращения конфликтов потоков"""
     file_data = f"{text}_{lang}_{speed_level}_{tld}"
     file_hash = hashlib.md5(file_data.encode('utf-8')).hexdigest()
-    return f"anki_audio_{file_hash}.mp3"
+    # Добавляем временную метку в микросекундах для уникальности в многопоточной среде
+    timestamp = int(time.time() * 1000000)
+    return f"anki_audio_{file_hash}_{timestamp}.mp3"
 
 def generate_audio(text, lang=None, speed_level=None, tld=None, debug=True):
     """Генерирует аудиофайл"""
@@ -179,10 +181,9 @@ def generate_audio(text, lang=None, speed_level=None, tld=None, debug=True):
     filename = generate_unique_filename(processed_text, lang, speed_level, tld)
     filepath = os.path.join(audio_folder, filename)
     
-    # Кэширование аудио
-    if os.path.exists(filepath):
-        if debug: print(f"✅ Взят из кэша: {filename}")
-        return filepath
+    # ПРИМЕЧАНИЕ: Мы убрали кэширование по хэшу текста здесь, 
+    # так как теперь каждый вызов создает уникальный файл с меткой времени.
+    # Это предотвращает конфликты между потоками (например, когда один удаляет файл, а другой читает).
         
     try:
         from gtts import gTTS  # Lazy import

@@ -258,13 +258,33 @@ def process_results_queue(root):
                 if "ai_model_label" in widgets:
                     widgets["ai_model_label"].configure(text="⚠️ Ollama недоступен", text_color="#ff5555")
             elif data:
-                current_model = app_state.ollama_model or tvars.get("ollama_var", tk.StringVar()).get()
+                current_model = app_state.ollama_model or (tvars.get("ollama_var").get() if "ollama_var" in tvars else "")
+                
+                # Если текущая модель не в списке или не задана, выбираем первую доступную
                 if not current_model or current_model not in data:
-                    app_state.ollama_model = data[0]
+                    new_model = data[0]
+                    print(f"🔄 Модель '{current_model}' не найдена. Авто-выбор: '{new_model}'")
+                    
+                    app_state.ollama_model = new_model
                     if "ollama_var" in tvars:
-                        tvars["ollama_var"].set(data[0])
+                        tvars["ollama_var"].set(new_model)
+                    
                     if "ai_model_label" in widgets:
-                        widgets["ai_model_label"].configure(text=f"⚡ {data[0]}")
+                        widgets["ai_model_label"].configure(text=f"⚡ {new_model}")
+                    
+                    # Сохраняем настройки, чтобы выбор применился при следующем запуске
+                    try:
+                        settings = load_settings(update_app_state=False)
+                        settings["OLLAMA_MODEL"] = new_model
+                        from core.settings_manager import save_settings
+                        save_settings(settings)
+                        print(f"✅ Настройки обновлены: OLLAMA_MODEL={new_model}")
+                    except Exception as e:
+                        print(f"⚠️ Ошибка сохранения авто-выбранной модели: {e}")
+                else:
+                    if "ai_model_label" in widgets:
+                        widgets["ai_model_label"].configure(text=f"⚡ {current_model}")
+                
                 print(f"✅ Ollama модели загружены: {len(data)} шт, текущая: {app_state.ollama_model}")
                 
         elif message == "decks_ok":
