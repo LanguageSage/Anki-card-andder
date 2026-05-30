@@ -134,47 +134,57 @@ class PromptsManager:
         return self.save_prompts(default_prompts)
     
     def _get_default_prompts(self) -> Dict:
-        """Возвращает дефолтные промпты для немецкого языка"""
+        """Возвращает дефолтные промпты для перевода с английского на популярные языки"""
         return {
-            "A1.1 - Начальный": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Spanish": {
+                "translate": "Translate the following English phrase or sentence into Spanish accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Spanish. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Spanish:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Spanish]\nCONTEXT: [briefly explain key vocabulary, verb conjugations, gender/number agreement, grammatical points, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "A1.2 - Базовый": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to French": {
+                "translate": "Translate the following English phrase or sentence into French accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in French. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to French:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into French]\nCONTEXT: [briefly explain key vocabulary, French verb tenses, gender agreement, grammatical points, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "A2.1 - Элементарный": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to German": {
+                "translate": "Translate the following English phrase or sentence into German accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in German. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to German:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into German]\nCONTEXT: [briefly explain key vocabulary, German cases (nominative, accusative, dative, genitive), verb placement, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "A2.2 - Предсредний": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Russian": {
+                "translate": "Translate the following English phrase or sentence into Russian accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Russian. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Russian:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Russian]\nCONTEXT: [briefly explain key vocabulary, Russian cases, verb aspects (perfective/imperfective), word order, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "B1.1 - Средний": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Chinese (Mandarin)": {
+                "translate": "Translate the following English phrase or sentence into Chinese (Simplified) accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Chinese. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Chinese (Simplified):\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Simplified Chinese with Pinyin in parentheses]\nCONTEXT: [briefly explain key vocabulary, Chinese grammar patterns, measure words, particle usage, and provide 1–3 similar example sentences with Pinyin and English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "B1.2 - Продвинутый средний": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Japanese": {
+                "translate": "Translate the following English phrase or sentence into Japanese accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Japanese. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Japanese:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Japanese (Kanji/Kana) with Romaji in parentheses]\nCONTEXT: [briefly explain key vocabulary, Japanese particles, politeness levels (polite/casual), grammar points, and provide 1–3 similar example sentences with Romaji and English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "B2.1 - Выше среднего": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Italian": {
+                "translate": "Translate the following English phrase or sentence into Italian accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Italian. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Italian:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Italian]\nCONTEXT: [briefly explain key vocabulary, Italian verb conjugations, articles, preposition contractions, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             },
-            "B2.2 - Продвинутый": {
-                "translate": DEFAULT_TRANSLATE_PROMPT,
-                "context": DEFAULT_CONTEXT_PROMPT,
-                "delimiter": "КОНТЕКСТ"
+            "English to Portuguese": {
+                "translate": "Translate the following English phrase or sentence into Portuguese accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Portuguese. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Portuguese:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Portuguese]\nCONTEXT: [briefly explain key vocabulary, Portuguese verb tenses, gender agreement, pronoun placement, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
+            },
+            "English to Arabic": {
+                "translate": "Translate the following English phrase or sentence into Arabic accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Arabic. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Arabic:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Arabic]\nCONTEXT: [briefly explain key vocabulary, Arabic root system, verb forms, sentence structure (nominal/verbal), and provide 1–3 similar example sentences with transliteration and English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
+            },
+            "English to Hindi": {
+                "translate": "Translate the following English phrase or sentence into Hindi accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Hindi. Do not use quotes, markdown, or any extra text.",
+                "context": "Analyze the following English sentence and translate it to Hindi:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Hindi]\nCONTEXT: [briefly explain key vocabulary, Hindi postpositions, verb-subject agreement, gender in Hindi nouns, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "delimiter": "CONTEXT"
             }
         }
 

@@ -26,6 +26,7 @@ dist/
 # User data (не публиковать на GitHub)
 anki_settings.txt
 user_files/
+git_backup/
 
 # OS
 .DS_Store
