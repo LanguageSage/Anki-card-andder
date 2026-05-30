@@ -118,7 +118,7 @@ class BaseAIProvider(ABC):
         unique_patterns = list(set([p for p in context_patterns if p]))
         escaped_patterns = [re.escape(p) for p in unique_patterns]
         
-        context_regex = r'[*_]*(' + '|'.join(escaped_patterns) + r')[:*_]*'
+        context_regex = r'(?:[\r\n]+|^)[*_]*(' + '|'.join(escaped_patterns) + r')[:*_ \t]*'
         
         parts = re.split(context_regex, text, maxsplit=1, flags=re.IGNORECASE)
         

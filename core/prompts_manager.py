@@ -152,8 +152,8 @@ class PromptsManager:
                 "delimiter": "CONTEXT"
             },
             "English to Russian": {
-                "translate": "Translate the following English phrase or sentence into Russian accurately:\n\n\"{phrase}\"\n\nRespond ONLY with the translation in Russian. Do not use quotes, markdown, or any extra text.",
-                "context": "Analyze the following English sentence and translate it to Russian:\n\n\"{phrase}\"\n\nRespond strictly in the following format (do not add any extra commentary or markdown):\n\nTRANSLATION: [natural and accurate translation into Russian]\nCONTEXT: [briefly explain key vocabulary, Russian cases, verb aspects (perfective/imperfective), word order, and provide 1–3 similar example sentences with English translations. Avoid tables.]",
+                "translate": "Переведи следующую английскую фразу или предложение на русский язык качественно:\n\n\"{phrase}\"\n\nОтветь только переводом на русском языке. Не используй в ответе кавычки, маркдаун или любой дополнительный текст.",
+                "context": "Проанализируй следующее английское предложение и переведи его на русский язык:\n\n\"{phrase}\"\n\nОтветь строго в следующем формате (не добавляй ничего лишнего, без таблиц и маркдауна):\n\nTRANSLATION: [качественный перевод на русский язык]\nCONTEXT: [подробно объясни грамматику, сложные слова, падежи или спряжения глаголов на русском языке. Вся информация в этой секции CONTEXT должна быть написана исключительно на русском языке для изучающих английский. Приведи 1-3 похожих примера предложений с переводом на русский язык. Избегай таблиц.]",
                 "delimiter": "CONTEXT"
             },
             "English to Chinese (Mandarin)": {
