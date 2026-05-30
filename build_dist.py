@@ -121,7 +121,7 @@ def build_packages(version: str, exe_path: str):
 
 
 def main():
-    version = get_version("1.1")
+    version = get_version("1.3")
 
     print(f"\n[*] Lerne Build Tool -- Version {version}")
     print(f"    Spec: {SPEC_FILE}")
