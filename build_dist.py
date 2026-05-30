@@ -93,12 +93,25 @@ def build_packages(version: str, exe_path: str):
             shutil.rmtree(d)
         os.makedirs(d)
 
-    # -- Standard: только EXE -----------------------------------------
-    shutil.copy2(exe_path, os.path.join(standard_dir, EXE_NAME))
-    print(f"  [Standard] Скопирован {EXE_NAME}")
+    # -- Standard: копируем все собранные файлы и папки ------------------
+    src_dir = os.path.dirname(exe_path)
+    for item in os.listdir(src_dir):
+        s = os.path.join(src_dir, item)
+        d = os.path.join(standard_dir, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d)
+        else:
+            shutil.copy2(s, d)
+    print(f"  [Standard] Скопировано содержимое из {src_dir}")
 
-    # -- Portable: EXE + маркер portable ------------------------------
-    shutil.copy2(exe_path, os.path.join(portable_dir, EXE_NAME))
+    # -- Portable: копируем все собранные файлы и папки + маркер ----------
+    for item in os.listdir(src_dir):
+        s = os.path.join(src_dir, item)
+        d = os.path.join(portable_dir, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d)
+        else:
+            shutil.copy2(s, d)
     marker_path = os.path.join(portable_dir, "portable")
     with open(marker_path, "w", encoding="utf-8") as f:
         f.write(
@@ -107,7 +120,7 @@ def build_packages(version: str, exe_path: str):
             "# (настройки, аудио, логи) в этой же папке, а не в %APPDATA%.\n"
             "# Идеально для использования на флешке или без установки.\n"
         )
-    print(f"  [Portable] Скопирован {EXE_NAME} + создан маркер 'portable'")
+    print(f"  [Portable] Скопировано содержимое из {src_dir} + создан маркер 'portable'")
 
     # -- ZIP архивы ----------------------------------------------------
     release_dir = os.path.join(DIST_DIR, "release")
