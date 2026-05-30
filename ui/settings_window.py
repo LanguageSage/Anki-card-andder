@@ -341,7 +341,16 @@ def _create_prompts_tab(tab_prompts, settings, win):
     except Exception:
         pass
     
+    if not initial_preset and preset_names:
+        initial_preset = preset_names[0]
+    
     preset_var = tk.StringVar(value=initial_preset)
+    
+    initial_translate = settings.get("TRANSLATE_PROMPT", "")
+    initial_context = settings.get("CONTEXT_PROMPT", "")
+    if initial_preset in presets:
+        initial_translate = presets[initial_preset].get("translate", presets[initial_preset].get("translation", ""))
+        initial_context = presets[initial_preset].get("context", "")
     
     preset_row = ctk.CTkFrame(tab_prompts, fg_color="transparent")
     preset_row.pack(fill="x", padx=5, pady=(0, 10))
@@ -354,13 +363,13 @@ def _create_prompts_tab(tab_prompts, settings, win):
     ctk.CTkLabel(tab_prompts, text=localization_manager.get_text("translate_prompt_label")).pack(anchor="w", padx=5)
     translate_editor = ctk.CTkTextbox(tab_prompts, height=100)
     translate_editor.pack(fill="x", padx=5, pady=5)
-    translate_editor.insert("1.0", settings.get("TRANSLATE_PROMPT", ""))
+    translate_editor.insert("1.0", initial_translate)
     setup_text_widget_context_menu(translate_editor)
     
     ctk.CTkLabel(tab_prompts, text=localization_manager.get_text("context_prompt_label")).pack(anchor="w", padx=5)
     context_editor = ctk.CTkTextbox(tab_prompts, height=250)
     context_editor.pack(fill="both", expand=True, padx=5, pady=5)
-    context_editor.insert("1.0", settings.get("CONTEXT_PROMPT", ""))
+    context_editor.insert("1.0", initial_context)
     setup_text_widget_context_menu(context_editor)
     
     def on_preset_select(choice):

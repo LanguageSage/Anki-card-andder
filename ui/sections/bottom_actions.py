@@ -115,13 +115,19 @@ def build_bottom_actions(root, main_frame, widgets, tvars, settings, dependencie
         try:
             prompt_names = prompts_manager.get_preset_names()
             widgets["prompt_combo"].configure(values=prompt_names)
-            if last_prompt and last_prompt in prompt_names:
-                tvars["prompt_var"].set(last_prompt)
+            
+            selected_prompt = last_prompt
+            if not selected_prompt or selected_prompt not in prompt_names:
+                if prompt_names:
+                    selected_prompt = prompt_names[0]
+            
+            if selected_prompt and selected_prompt in prompt_names:
+                tvars["prompt_var"].set(selected_prompt)
                 if "prompt_status_label" in widgets:
                     widgets["prompt_status_label"].configure(
-                        text=localization_manager.get_text("prompt_label", name=last_prompt)
+                        text=localization_manager.get_text("prompt_label", name=selected_prompt)
                     )
-                on_prompt_select_fn(last_prompt)
+                on_prompt_select_fn(selected_prompt)
         except Exception as e:
             print(f"Ошибка обновления промптов: {e}")
 
